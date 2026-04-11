@@ -1,0 +1,33 @@
+/* ================= RESET ================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================= ROOT ================= */
+html, body, #root {
+  height: 100%;
+  overflow-x: hidden; 
+}
+
+/* ================= APP LAYOUT ================= */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 🔥 THIS CONTROLS YOUR PAGE HEIGHT */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= SAFETY ================= */
+body {
+  overflow-x: hidden;
+  font-family: 'Montserrat', sans-serif;
+}

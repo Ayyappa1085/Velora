@@ -1,0 +1,29 @@
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Search Icon */
+.search-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Input Field */
+.search-input {
+  width: 0;
+  opacity: 0;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.3s ease;
+  height: 32px;
+}
+
+/* When visible */
+.search-container .search-input.active {
+  width: 180px;
+  opacity: 1;
+}
