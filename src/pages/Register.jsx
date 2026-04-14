@@ -6,28 +6,47 @@ function Register() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Disable scroll
+  const closeTo =
+    location.state?.backgroundLocation?.pathname || "/";
+
   useEffect(() => {
+  const scrollY = window.scrollY;
+
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
   document.body.style.overflow = "hidden";
 
   const handleEsc = (e) => {
     if (e.key === "Escape") {
-      navigate(-1);
+      navigate(closeTo, { replace: true });
     }
   };
 
   document.addEventListener("keydown", handleEsc);
 
   return () => {
-    document.body.style.overflow = "auto";
     document.removeEventListener("keydown", handleEsc);
-  };
-}, [navigate]);
 
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    document.body.style.overflow = "";
+
+    window.scrollTo(0, scrollY);
+  };
+}, [navigate, closeTo]);
   return (
-    <div className="auth-overlay" onClick={() => navigate(-1)}>
+    <div
+      className="auth-overlay"
+      onClick={() => navigate(closeTo, { replace: true })}
+    >
       <div
-        className="auth-box"
+        className="auth-box register-box"
         onClick={(e) => e.stopPropagation()}
       >
         <h2>Register</h2>
@@ -45,6 +64,7 @@ function Register() {
             onClick={() =>
               navigate("/login", {
                 state: location.state,
+                replace: true,
               })
             }
           >

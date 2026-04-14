@@ -15,7 +15,8 @@ body {
   flex-direction: column;
   width: 100%;
   flex: 1;
-  height: 100%; /* 🔥 ADD THIS */
+  /* ✅ FIX: was height:100% — that trapped scroll in the container.
+     Use min-height:0 only to allow flex shrinking, not to cap height. */
   min-height: 0;
 }
 
@@ -23,7 +24,6 @@ body {
 .main-layout {
   display: flex;
   flex: 1;
-  height: 100%; /* 🔥 ADD THIS */
   min-height: 0;
 }
 
@@ -33,7 +33,7 @@ body {
   overflow: hidden;
   cursor: pointer;
   flex: 1;
-  display: flex; /* ✅ desktop uses flex instead of vh */
+  display: flex;
 }
 
 .section img {
@@ -41,7 +41,7 @@ body {
   height: 100%;
   flex: 1;
   object-fit: cover;
-  object-position: top center; /* ✅ desktop crops bottom */
+  object-position: top center;
   transition: transform 0.5s ease;
 }
 
@@ -87,7 +87,7 @@ body {
 
 .kids,
 .footwear {
-  flex: 1; /* ✅ each half of right column */
+  flex: 1;
   position: relative;
   overflow: hidden;
 }
@@ -97,7 +97,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top center; /* ✅ desktop crops bottom */
+  object-position: top center;
   transition: transform 0.5s ease;
 }
 
@@ -116,38 +116,32 @@ body {
   align-items: center;
 }
 
-/* ===================================================== */
-/* ================= MOBILE VERSION ===================== */
-/* ===================================================== */
+/* ================= MOBILE ================= */
 @media (max-width: 768px) {
 
   .main-layout {
     flex-direction: column;
   }
 
-  /* FULL WIDTH STACK */
   .men,
   .women,
   .right-section {
     width: 100%;
   }
 
-  /* 🔥 kill flex interference ONLY for right section */
   .right-section {
     display: block !important;
     height: auto !important;
   }
 
-  /* 🔥 force consistent section heights */
   .section,
   .kids,
   .footwear {
-    height: 25vh !important; /* ✅ neat stacked look */
+    height: 20vh !important;
     aspect-ratio: unset !important;
     flex: none;
   }
 
-  /* 🔥 ensure images crop middle */
   .section img,
   .kids img,
   .footwear img {
@@ -156,8 +150,12 @@ body {
     object-position: center center !important;
   }
 
-  /* Smaller overlay text */
   .overlay {
     font-size: 20px;
   }
-} 
+}
+@media (max-width: 768px) {
+  .home-container {
+    padding-top: 22px;
+  }
+}

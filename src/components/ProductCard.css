@@ -117,7 +117,14 @@
   color: #999;
   text-decoration: line-through;
 }
+.product-card {
+  transition: transform 0.28s ease,
+              box-shadow 0.28s ease;
+}
 
+.product-card:hover {
+  transform: translateY(-4px);
+}
 /* ================= MOBILE ================= */
 @media (max-width: 768px) {
   .card-img {
@@ -131,4 +138,49 @@
   .wishlist-icon svg {
     font-size: 18px;
   }
+  .wishlist-icon svg {
+  font-size: 20px;
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.wishlist-icon svg:hover {
+  color: red;
+}
+}
+/* SIZE PICKER */
+.size-picker {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.size-picker button {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.size-picker button:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+/* BAG SIZE LABEL */
+.bag-size {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 999px;
 }

@@ -1,26 +1,20 @@
 import { useNavigate, useParams } from "react-router-dom";
 import "./Sidebar.css";
-
-const itemsMap = {
-  men: ["shirts", "jeans", "watches"], // ✅ FIXED
-  women: ["sarees", "kurtas"],
-  kids: ["shirts", "pants"],
-  footwear: ["sneakers", "formal"],
-};
+import { CATEGORY_ITEMS } from "../data/categories";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { category, item } = useParams(); // ✅ FIXED
+  const { category, item } = useParams();
 
-  if (!itemsMap[category]) return null;
+  if (!CATEGORY_ITEMS[category]) return null;
 
   return (
     <aside className="sidebar">
       <ul>
-        {itemsMap[category].map((sub) => (
+        {CATEGORY_ITEMS[category].map((sub) => (
           <li
             key={sub}
-            className={item === sub ? "active" : ""} // ✅ FIXED
+            className={item === sub ? "active" : ""}
             onClick={() => navigate(`/${category}/${sub}`)}
           >
             {sub.toUpperCase()}

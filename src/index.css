@@ -1,13 +1,22 @@
-/* 🔥 ROOT LAYOUT FIX */
-.app-container {
+/* index.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* ✅ min-height NOT height:100% — allows window to scroll naturally */
+  min-height: 100%;
+  overflow-x: hidden;
+  font-family: 'Montserrat', sans-serif;
+}
+
+#root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-/* 🔥 CONTENT SHOULD EXPAND */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }

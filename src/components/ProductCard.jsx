@@ -2,17 +2,18 @@ import "./ProductCard.css";
 import ProductImage from "./ProductImage";
 import ProductInfo from "./ProductInfo";
 
-function ProductCard({ product }) {
+function ProductCard({
+  product,
+  isWishlist = false,
+}) {
   return (
     <div className="product-card">
+      <ProductImage product={product} />
 
-      <ProductImage 
-        image={product.image} 
-        title={product.title} 
+      <ProductInfo
+        product={product}
+        isWishlist={isWishlist}
       />
-
-      <ProductInfo product={product} />
-
     </div>
   );
 }

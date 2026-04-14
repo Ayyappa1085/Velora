@@ -1,15 +1,14 @@
+/* components/Content.css */
+
 /* ================= MAIN CONTENT AREA ================= */
 .content {
   display: flex;
   justify-content: center;
 
-  align-items: flex-start;   /* vertical control */
+  align-items: flex-start;
   padding: 120px 20px 50px;
 
   width: 100%;
-
-  /* ❌ REMOVED BROKEN HACK */
-  /* margin-left: -125px; */
 }
 
 /* ================= WRAPPER ================= */
@@ -20,7 +19,7 @@
   gap: 40px;
 
   width: 100%;
-  max-width: 900px;   /* 🔥 keeps it centered & controlled */
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -97,16 +96,36 @@
 
 /* ================= MOBILE ================= */
 @media (max-width: 768px) {
-  .offers-wrapper {
-    flex-direction: column;
+  .content {
+    padding: 0;
   }
 
-  .side-img {
-    height: 200px;
+  .offers-wrapper {
+    width: 100%;
   }
 
   .offers-box {
-    width: 100%;
-    max-width: 350px;
+    width: 350px;
+    height: 190px;
+    padding: 14px;
+  }
+
+  .offer-content h2 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .offer-content p {
+    font-size: 13px;
+  }
+
+  .dots {
+    gap: 6px;
+    padding-top: 4px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
   }
 }

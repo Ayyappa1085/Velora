@@ -12,27 +12,75 @@ function CategoryLayout() {
 
   const isSubCategory = !!item;
 
-  const filteredProducts = isSubCategory
+  let filteredProducts = isSubCategory
     ? PRODUCTS.filter(
         (p) =>
-          p.category.toLowerCase() === category?.toLowerCase() &&
-          p.type.toLowerCase() === item?.toLowerCase()
+          p.category.toLowerCase() ===
+            category?.toLowerCase() &&
+          p.type.toLowerCase() ===
+            item?.toLowerCase()
       )
     : [];
 
-  return (
-    <div className="category-layout">
+  const sortType =
+    localStorage.getItem(
+      "velora-sort"
+    ) || "default";
 
-      {!isSubCategory && <SidebarSection />}
+  if (sortType === "low") {
+    filteredProducts = [
+      ...filteredProducts,
+    ].sort(
+      (a, b) => a.price - b.price
+    );
+  }
+
+  if (sortType === "high") {
+    filteredProducts = [
+      ...filteredProducts,
+    ].sort(
+      (a, b) => b.price - a.price
+    );
+  }
+
+  if (sortType === "az") {
+    filteredProducts = [
+      ...filteredProducts,
+    ].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  if (sortType === "za") {
+    filteredProducts = [
+      ...filteredProducts,
+    ].sort((a, b) =>
+      b.name.localeCompare(a.name)
+    );
+  }
+
+  return (
+    <div
+      className={`category-layout ${
+        isSubCategory
+          ? "sub-page"
+          : "root-page"
+      }`}
+    >
+      {!isSubCategory && (
+        <SidebarSection />
+      )}
 
       <div className="content-wrapper">
-
-        {!isSubCategory && <OffersSection />}
-
-        {isSubCategory && (
-          <ProductsSection products={filteredProducts} />
+        {!isSubCategory && (
+          <OffersSection />
         )}
 
+        {isSubCategory && (
+          <ProductsSection
+            products={filteredProducts}
+          />
+        )}
       </div>
     </div>
   );

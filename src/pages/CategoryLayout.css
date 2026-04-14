@@ -1,7 +1,10 @@
+/* CategoryLayout.css */
+
 /* ================= MAIN LAYOUT ================= */
 .category-layout {
   display: flex;
-  min-height: calc(100vh - 112px); /* ✅ FIX: keeps footer down */
+  /* FIX: was calc(100vh - 112px) hardcoded — now uses dvh with a safe offset */
+  min-height: calc(100dvh - 108px);
 }
 
 /* SIDEBAR */
@@ -13,7 +16,7 @@
 .content-wrapper {
   flex: 1;
   display: flex;
-  flex-direction: column; /* ✅ IMPORTANT */
+  flex-direction: column;
   padding: 10px 12px;
 }
 
@@ -37,7 +40,6 @@
   max-width: 100%;
 }
 
-
 /* TABLET */
 @media (max-width: 1024px) {
   .products-grid {
@@ -50,29 +52,63 @@
 
   .category-layout {
     flex-direction: column;
-    min-height: calc(100vh - 112px); /* ✅ keep fix */
+    position: relative;
+  }
+
+  /* Sidebar root pages: /men */
+  .category-layout.root-page {
+    /* FIX: was 170px hardcoded — mobile topbar(32) + navbar(auto ~120) + bottom-nav(56) */
+    height: calc(100dvh - 208px);
+    overflow: hidden;
+  }
+
+  /* Product pages: /men/shirts */
+  .category-layout.sub-page {
+    height: auto;
+    min-height: calc(100dvh - 208px);
+    overflow: visible;
   }
 
   .sidebar-wrapper {
     width: 100%;
   }
-  .products-grid > * {
-  min-width: 0;   /* ✅ prevents overflow shift */
-}
-  .offers-wrapper-desktop {
-    display: none;
-  }
 
   .content-wrapper {
-    padding: 10px;
+    padding: 0;
+    position: static;
+  }
+
+  .offers-wrapper-desktop {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .products-grid > * {
+    min-width: 0;
   }
 
   .products-container {
-    min-height: 60vh; /* ✅ prevents collapse on mobile */
+    min-height: auto;
   }
 
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
+  }
+}
+@media (max-width: 768px) {
+  .category-layout.sub-page .content-wrapper {
+    padding-top: 20px;
+  }
+}
+@media (max-width: 768px) {
+  .category-layout.root-page .sidebar-wrapper {
+    padding-top: 22px;
   }
 }

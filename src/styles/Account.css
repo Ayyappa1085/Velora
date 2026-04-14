@@ -1,0 +1,139 @@
+.account-page {
+  height: calc(100vh - 108px);
+  overflow: hidden;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f8f8, #ececec);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.account-card {
+  width: 100%;
+  max-width: 700px;
+  max-height: 100%;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.profile-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.joined-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.profile-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.info-box {
+  background: #f6f6f6;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.info-box span {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.account-actions,
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-card button {
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: black;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.account-card button:hover {
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: #d11a2a !important;
+}
+
+.order-card {
+  background: #f7f7f7;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #eee;
+}
+
+.track-input {
+  width: 100%;
+  padding: 12px;
+  margin: 14px 0;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.track-result {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: #eef8ee;
+  font-weight: 600;
+}
+
+.demo-track {
+  font-size: 13px;
+  color: #666;
+  margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .account-page {
+    height: 100vh;
+    padding: 110px 14px 80px;
+    overflow: hidden;
+    align-items: flex-start;
+  }
+
+  .account-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .profile-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-info {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,18 +1,22 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-import { useState } from "react";
+import { useWishlist } from "./WishlistContext";
 
-function ProductImage({ image, title }) {
-  const [liked, setLiked] = useState(false);
+function ProductImage({ product }) {
+  const { wishlist, toggleWishlist } = useWishlist();
+
+  const isLiked = wishlist.some(
+    (item) => item.id === product.id
+  );
 
   return (
     <div className="card-img">
-      <img src={image} alt={title} />
+      <img src={product.image} alt={product.title} />
 
       <div
         className="wishlist-icon"
-        onClick={() => setLiked(!liked)}
+        onClick={() => toggleWishlist(product)}
       >
-        {liked ? <FaHeart /> : <FaRegHeart />}
+        {isLiked ? <FaHeart /> : <FaRegHeart />}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+// components/OfferDots.jsx
 function OfferDots({ offers, index, setIndex }) {
   return (
     <div className="dots">
