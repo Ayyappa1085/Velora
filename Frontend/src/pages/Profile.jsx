@@ -19,7 +19,6 @@ function Profile() {
   return (
     <div className="profile-page">
       <div className="profile-container">
-
         {/* LEFT - PROFILE CARD */}
         <div className="profile-card">
           <img
@@ -32,8 +31,7 @@ function Profile() {
 
           {/* ✅ REAL DATE */}
           <p className="joined">
-            Member since{" "}
-            {new Date(user.createdAt).toLocaleDateString()}
+            Member since {new Date(user.createdAt).toLocaleDateString()}
           </p>
 
           <div className="profile-details">
@@ -45,9 +43,7 @@ function Profile() {
             {/* ✅ OPTIONAL FIELD */}
             <div>
               <span>Phone</span>
-              <strong>
-                {user.phone || "Not provided"}
-              </strong>
+              <strong>{user.phone || "Not provided"}</strong>
             </div>
           </div>
         </div>
@@ -64,14 +60,10 @@ function Profile() {
             🚚 Track Order
           </button>
 
-          <button
-            className="logout-btn"
-            onClick={handleLogout}
-          >
+          <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
-
       </div>
     </div>
   );

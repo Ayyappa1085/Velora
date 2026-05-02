@@ -118,8 +118,9 @@
   text-decoration: line-through;
 }
 .product-card {
-  transition: transform 0.28s ease,
-              box-shadow 0.28s ease;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
 .product-card:hover {
@@ -139,14 +140,14 @@
     font-size: 18px;
   }
   .wishlist-icon svg {
-  font-size: 20px;
-  color: #000;
-  transition: color 0.2s ease;
-}
+    font-size: 20px;
+    color: #000;
+    transition: color 0.2s ease;
+  }
 
-.wishlist-icon svg:hover {
-  color: red;
-}
+  .wishlist-icon svg:hover {
+    color: red;
+  }
 }
 /* SIZE PICKER */
 .size-picker {

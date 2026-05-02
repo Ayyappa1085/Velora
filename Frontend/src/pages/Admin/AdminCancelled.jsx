@@ -1,62 +1,41 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+
+// ✅ ADD THIS
+import api from "../../utils/api";
 
 function AdminCancelled() {
-  const [orders, setOrders] =
-    useState([]);
-  const [loading, setLoading] =
-    useState(true);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const getToken = () =>
-    localStorage.getItem("token");
+  // ⚠️ KEEP (not breaking your code)
+  const getToken = () => localStorage.getItem("token");
 
   useEffect(() => {
-    const loadOrders =
-      async () => {
-        try {
-          const token =
-            getToken();
+    const loadOrders = async () => {
+      try {
+        // ❌ REMOVE token usage (handled in api.js)
+        // const token = getToken();
 
-          const res =
-            await axios.get(
-              "http://localhost:5000/api/orders",
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+        // ✅ FIXED
+        const res = await api.get("/api/orders");
 
-          // 🔥 FIX SAFE DATA
-          const data =
-            Array.isArray(
-              res.data
-            )
-              ? res.data
-              : res.data.orders || [];
+        // 🔥 SAFE DATA
+        const data = Array.isArray(res.data) ? res.data : res.data.orders || [];
 
-          setOrders(data);
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
-        }
-      };
+        setOrders(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     loadOrders();
   }, []);
 
-  const cancelled =
-    orders.filter(
-      (item) =>
-        item.status ===
-          "Cancelled" ||
-        item.status ===
-          "Failed"
-    );
+  const cancelled = orders.filter(
+    (item) => item.status === "Cancelled" || item.status === "Failed",
+  );
 
   if (loading) {
     return (
@@ -68,63 +47,29 @@ function AdminCancelled() {
 
   return (
     <div className="admin-panel-box">
-      <h2>
-        Failed / Cancelled Orders
-      </h2>
+      <h2>Failed / Cancelled Orders</h2>
 
-      {cancelled.length ===
-      0 ? (
-        <p>
-          No cancelled
-          orders found.
-        </p>
+      {cancelled.length === 0 ? (
+        <p>No cancelled orders found.</p>
       ) : (
         <div className="cancelled-list">
-          {cancelled.map(
-            (item) => (
-              <div
-                className="cancel-card"
-                key={
-                  item._id
-                }
-              >
-                <div>
-                  <h4>
-                    {
-                      item.customerName
-                    }
-                  </h4>
+          {cancelled.map((item) => (
+            <div className="cancel-card" key={item._id}>
+              <div>
+                <h4>{item.customerName}</h4>
 
-                  <p>
-                    {
-                      item.phone
-                    }
-                  </p>
+                <p>{item.phone}</p>
 
-                  <small>
-                    {new Date(
-                      item.createdAt
-                    ).toLocaleDateString()}
-                  </small>
-                </div>
-
-                <div className="cancel-right">
-                  <span className="cancel-badge">
-                    {
-                      item.status
-                    }
-                  </span>
-
-                  <strong>
-                    ₹
-                    {Math.round(
-                      item.totalAmount || 0
-                    )}
-                  </strong>
-                </div>
+                <small>{new Date(item.createdAt).toLocaleDateString()}</small>
               </div>
-            )
-          )}
+
+              <div className="cancel-right">
+                <span className="cancel-badge">{item.status}</span>
+
+                <strong>₹{Math.round(item.totalAmount || 0)}</strong>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

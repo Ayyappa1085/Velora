@@ -1,4 +1,4 @@
-import "./Navbar/Navbar.css";// ✅ reuse same CSS (no change)
+import "./Navbar/Navbar.css"; // ✅ reuse same CSS (no change)
 
 function Footer() {
   return (

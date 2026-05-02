@@ -6,15 +6,9 @@ import "./Checkout.css";
 function Checkout() {
   const navigate = useNavigate();
 
-  const {
-    bag,
-    totalItems,
-    totalPrice,
-    coupon,
-  } = useBag();
+  const { bag, totalItems, totalPrice, coupon } = useBag();
 
-  const savedAddress =
-    JSON.parse(localStorage.getItem("velora-address")) || {};
+  const savedAddress = JSON.parse(localStorage.getItem("velora-address")) || {};
 
   const [formData, setFormData] = useState({
     name: savedAddress.name || "",
@@ -32,12 +26,10 @@ function Checkout() {
   const [error, setError] = useState("");
 
   const discountAmount = Math.round(
-    (totalPrice * (coupon?.discount || 0)) / 100
+    (totalPrice * (coupon?.discount || 0)) / 100,
   );
 
-  const finalTotal = Math.round(
-    totalPrice - discountAmount
-  );
+  const finalTotal = Math.round(totalPrice - discountAmount);
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
@@ -50,24 +42,19 @@ function Checkout() {
     if (name === "pincode" && value.length === 6) {
       try {
         const res = await fetch(
-          `https://api.postalpincode.in/pincode/${value}`
+          `https://api.postalpincode.in/pincode/${value}`,
         );
 
         const data = await res.json();
         const result = data[0];
 
-        if (
-          result.Status === "Success" &&
-          result.PostOffice?.length
-        ) {
+        if (result.Status === "Success" && result.PostOffice?.length) {
           const offices = result.PostOffice;
 
           const district = offices[0].District;
           const state = offices[0].State;
 
-          const cities = [
-            ...new Set(offices.map((i) => i.Name)),
-          ].slice(0, 4);
+          const cities = [...new Set(offices.map((i) => i.Name))].slice(0, 4);
 
           setCityOptions([...cities, "Other"]);
 
@@ -116,10 +103,7 @@ function Checkout() {
       return;
     }
 
-    localStorage.setItem(
-      "velora-address",
-      JSON.stringify(formData)
-    );
+    localStorage.setItem("velora-address", JSON.stringify(formData));
 
     // ✅ ONLY CHANGE (FIX FLOW)
     navigate("/order-summary", {
@@ -132,13 +116,9 @@ function Checkout() {
       <div className="checkout-card">
         <div className="checkout-left">
           <h1>Checkout</h1>
-          <p className="checkout-subtitle">
-            Fill your delivery details
-          </p>
+          <p className="checkout-subtitle">Fill your delivery details</p>
 
-          {error && (
-            <p className="error-text">{error}</p>
-          )}
+          {error && <p className="error-text">{error}</p>}
 
           <div className="checkout-grid">
             <div className="input-group">
@@ -218,10 +198,7 @@ function Checkout() {
             </div>
           </div>
 
-          <button
-            className="continue-btn"
-            onClick={handleContinue}
-          >
+          <button className="continue-btn" onClick={handleContinue}>
             Continue to Payment
           </button>
         </div>
@@ -233,9 +210,7 @@ function Checkout() {
             <p>Items: {totalItems}</p>
             <p>Subtotal: ₹{totalPrice}</p>
 
-            {coupon?.discount > 0 && (
-              <p>Discount: -₹{discountAmount}</p>
-            )}
+            {coupon?.discount > 0 && <p>Discount: -₹{discountAmount}</p>}
 
             <p>
               <strong>Total: ₹{finalTotal}</strong>

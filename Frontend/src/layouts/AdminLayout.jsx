@@ -5,51 +5,25 @@ import AdminHeader from "../components/Admin/AdminHeader";
 import "../styles/Admin.css";
 
 function AdminLayout() {
-  const [open, setOpen] =
-    useState(false);
+  const [open, setOpen] = useState(false);
 
-  const toggleSidebar =
-    () =>
-      setOpen(
-        (prev) => !prev
-      );
+  const toggleSidebar = () => setOpen((prev) => !prev);
 
-  const closeSidebar =
-    () => setOpen(false);
+  const closeSidebar = () => setOpen(false);
 
   return (
     <div className="admin-shell">
       {/* Hamburger */}
-      <button
-        className="menu-btn"
-        onClick={toggleSidebar}
-      >
+      <button className="menu-btn" onClick={toggleSidebar}>
         ☰
       </button>
 
       {/* Overlay */}
-      {open && (
-        <div
-          className="admin-overlay"
-          onClick={
-            closeSidebar
-          }
-        ></div>
-      )}
+      {open && <div className="admin-overlay" onClick={closeSidebar}></div>}
 
       {/* Sidebar */}
-      <div
-        className={`sidebar-wrap ${
-          open
-            ? "show"
-            : ""
-        }`}
-      >
-        <AdminSidebar
-          closeSidebar={
-            closeSidebar
-          }
-        />
+      <div className={`sidebar-wrap ${open ? "show" : ""}`}>
+        <AdminSidebar closeSidebar={closeSidebar} />
       </div>
 
       {/* Main */}

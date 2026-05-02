@@ -1,11 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./components/AuthContext";
 import { useNavigate } from "react-router-dom";
+
+// ✅ NEW (API CENTRALIZED)
+import api from "./utils/api";
 
 const BagContext = createContext();
 
@@ -22,15 +20,8 @@ export function BagProvider({ children }) {
 
   const fetchCart = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("/api/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
+      const res = await api.get("/api/cart");
+      const data = res.data;
       setBag(Array.isArray(data) ? data : []);
     } catch {
       setBag([]);
@@ -39,15 +30,8 @@ export function BagProvider({ children }) {
 
   const fetchSaved = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("/api/saved", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
+      const res = await api.get("/api/saved");
+      const data = res.data;
       setSaved(Array.isArray(data) ? data : []);
     } catch {
       setSaved([]);
@@ -75,9 +59,7 @@ export function BagProvider({ children }) {
       const percent = coupons[coupon.code];
 
       if (percent) {
-        const discount = Math.round(
-          totalPrice * (percent / 100)
-        );
+        const discount = Math.round(totalPrice * (percent / 100));
 
         setCoupon({
           code: coupon.code,
@@ -112,19 +94,10 @@ export function BagProvider({ children }) {
     }
 
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId: product._id,
-          size,
-          quantity: 1,
-        }),
+      await api.post("/api/cart/add", {
+        productId: product._id,
+        size,
+        quantity: 1,
       });
 
       await fetchCart();
@@ -133,21 +106,15 @@ export function BagProvider({ children }) {
     }
   };
 
-  // ✅ ADD THIS FUNCTION (MAIN FIX)
+  // ✅ FIXED (NO MORE 404)
   const clearBag = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/cart/clear", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.post("/api/cart/clear");
 
       setBag([]);
       setCoupon(null);
-    } catch {
+    } catch (err) {
+      console.log("CLEAR BAG ERROR:", err);
       setBag([]);
       setCoupon(null);
     }
@@ -155,17 +122,12 @@ export function BagProvider({ children }) {
 
   const increaseQty = async (productId, size) => {
     const item = bag.find(
-      (i) =>
-        i.product._id === productId &&
-        i.size === size
+      (i) => i.product._id === productId && i.size === size,
     );
 
     if (!item) return;
 
-    const stock =
-      item.product.sizeStock?.[size] ||
-      item.product.stock ||
-      0;
+    const stock = item.product.sizeStock?.[size] || item.product.stock || 0;
 
     if (item.quantity >= stock) {
       return { error: `Only ${stock} available` };
@@ -173,53 +135,35 @@ export function BagProvider({ children }) {
 
     setBag((prev) =>
       prev.map((i) =>
-        i.product._id === productId &&
-        i.size === size
+        i.product._id === productId && i.size === size
           ? { ...i, quantity: i.quantity + 1 }
-          : i
-      )
+          : i,
+      ),
     );
 
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("/api/cart/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId,
-          size,
-          quantity: item.quantity + 1,
-        }),
+      const res = await api.put("/api/cart/update", {
+        productId,
+        size,
+        quantity: item.quantity + 1,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { error: data.message };
-      }
-
+      const data = res.data;
       setBag(Array.isArray(data) ? data : []);
     } catch {
       setBag((prev) =>
         prev.map((i) =>
-          i.product._id === productId &&
-          i.size === size
+          i.product._id === productId && i.size === size
             ? { ...i, quantity: i.quantity - 1 }
-            : i
-        )
+            : i,
+        ),
       );
     }
   };
 
   const decreaseQty = async (productId, size) => {
     const item = bag.find(
-      (i) =>
-        i.product._id === productId &&
-        i.size === size
+      (i) => i.product._id === productId && i.size === size,
     );
 
     if (!item) return;
@@ -231,62 +175,37 @@ export function BagProvider({ children }) {
 
     setBag((prev) =>
       prev.map((i) =>
-        i.product._id === productId &&
-        i.size === size
+        i.product._id === productId && i.size === size
           ? { ...i, quantity: i.quantity - 1 }
-          : i
-      )
+          : i,
+      ),
     );
 
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("/api/cart/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId,
-          size,
-          quantity: item.quantity - 1,
-        }),
+      const res = await api.put("/api/cart/update", {
+        productId,
+        size,
+        quantity: item.quantity - 1,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { error: data.message };
-      }
-
+      const data = res.data;
       setBag(Array.isArray(data) ? data : []);
     } catch {
       setBag((prev) =>
         prev.map((i) =>
-          i.product._id === productId &&
-          i.size === size
+          i.product._id === productId && i.size === size
             ? { ...i, quantity: i.quantity + 1 }
-            : i
-        )
+            : i,
+        ),
       );
     }
   };
 
   const removeFromBag = async (productId, size) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/cart/remove", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId,
-          size,
-        }),
+      await api.post("/api/cart/remove", {
+        productId,
+        size,
       });
 
       await fetchCart();
@@ -295,24 +214,14 @@ export function BagProvider({ children }) {
 
   const saveForLater = async (productId, size) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/saved/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, size }),
+      await api.post("/api/saved/add", {
+        productId,
+        size,
       });
 
-      await fetch("/api/cart/remove", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, size }),
+      await api.post("/api/cart/remove", {
+        productId,
+        size,
       });
 
       await fetchCart();
@@ -322,28 +231,15 @@ export function BagProvider({ children }) {
 
   const moveToBagFromSaved = async (productId, size) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId,
-          size,
-          quantity: 1,
-        }),
+      await api.post("/api/cart/add", {
+        productId,
+        size,
+        quantity: 1,
       });
 
-      await fetch("/api/saved/remove", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, size }),
+      await api.post("/api/saved/remove", {
+        productId,
+        size,
       });
 
       await fetchCart();
@@ -353,15 +249,9 @@ export function BagProvider({ children }) {
 
   const removeFromSaved = async (productId, size) => {
     try {
-      const token = localStorage.getItem("token");
-
-      await fetch("/api/saved/remove", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, size }),
+      await api.post("/api/saved/remove", {
+        productId,
+        size,
       });
 
       await fetchSaved();
@@ -371,17 +261,11 @@ export function BagProvider({ children }) {
   const openBag = () => setIsBagOpen(true);
   const closeBag = () => setIsBagOpen(false);
 
-  const totalItems = bag.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems = bag.reduce((sum, item) => sum + item.quantity, 0);
 
   const totalPrice = bag.reduce(
-    (sum, item) =>
-      sum +
-      (item.product?.price || 0) *
-        item.quantity,
-    0
+    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    0,
   );
 
   const applyCoupon = (code) => {
@@ -399,9 +283,7 @@ export function BagProvider({ children }) {
       return { error: "Invalid coupon" };
     }
 
-    const discount = Math.round(
-      totalPrice * (percent / 100)
-    );
+    const discount = Math.round(totalPrice * (percent / 100));
 
     setCoupon({
       code: clean,
@@ -411,10 +293,7 @@ export function BagProvider({ children }) {
 
   const discountAmount = coupon?.discount || 0;
 
-  const finalTotal = Math.max(
-    0,
-    totalPrice - discountAmount
-  );
+  const finalTotal = Math.max(0, totalPrice - discountAmount);
 
   return (
     <BagContext.Provider
@@ -436,7 +315,7 @@ export function BagProvider({ children }) {
         discountAmount,
         finalTotal,
         applyCoupon,
-        clearBag, // ✅ exposed
+        clearBag,
       }}
     >
       {children}

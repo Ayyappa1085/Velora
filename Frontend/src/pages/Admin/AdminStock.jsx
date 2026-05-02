@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// ❌ REMOVE axios
+// import axios from "axios";
+
 import { CATEGORY_ITEMS } from "../../data/categories";
 import "../../styles/AdminStock.css";
+
+// ✅ ADD API
+import api from "../../utils/api";
 
 function AdminStock() {
   const [products, setProducts] = useState([]);
@@ -11,8 +16,8 @@ function AdminStock() {
   const [category, setCategory] = useState("all");
   const [subCategory, setSubCategory] = useState("all");
 
-  const getToken = () =>
-    localStorage.getItem("token");
+  // ⚠️ KEEP (not breaking structure)
+  const getToken = () => localStorage.getItem("token");
 
   useEffect(() => {
     loadProducts();
@@ -20,9 +25,7 @@ function AdminStock() {
 
   const loadProducts = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/products?limit=1000"
-      );
+      const res = await api.get("/api/products?limit=1000");
 
       setProducts(res.data.products || []);
     } catch (error) {
@@ -34,27 +37,23 @@ function AdminStock() {
     const product = products.find((p) => p._id === id);
     const updated = editStock[id];
 
-    if (!updated) return;
+    if (!updated || !product) return;
 
     try {
-      const token = getToken();
-
+      // ✅ SAFE MERGE (FIX)
       const finalStock = {
-        ...product.sizeStock,
+        ...(product.sizeStock || {
+          S: 0,
+          M: 0,
+          L: 0,
+          XL: 0,
+        }),
         ...updated,
       };
 
-      await axios.put(
-        `http://localhost:5000/api/products/stock/${id}`,
-        { sizeStock: finalStock },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.put(`/api/products/stock/${id}`, { sizeStock: finalStock });
 
-      // 🔥 FIX → reload from backend
+      // 🔥 reload
       await loadProducts();
 
       setEditStock((prev) => ({
@@ -69,23 +68,16 @@ function AdminStock() {
   const isLowStock = (qty) => qty > 0 && qty <= 2;
   const isOut = (qty) => qty === 0;
 
-  const subOptions =
-    category === "all"
-      ? []
-      : CATEGORY_ITEMS[category] || [];
+  const subOptions = category === "all" ? [] : CATEGORY_ITEMS[category] || [];
 
   const filtered = products.filter((item) => {
-    const matchSearch = item.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
+    const matchSearch = item.title.toLowerCase().includes(search.toLowerCase());
 
     const matchCategory =
-      category === "all" ||
-      item.category.toLowerCase() === category;
+      category === "all" || item.category.toLowerCase() === category;
 
     const matchSub =
-      subCategory === "all" ||
-      item.type.toLowerCase() === subCategory;
+      subCategory === "all" || item.type.toLowerCase() === subCategory;
 
     return matchSearch && matchCategory && matchSub;
   });
@@ -104,9 +96,7 @@ function AdminStock() {
           className="admin-search-input"
           placeholder="Search Product..."
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
@@ -127,16 +117,11 @@ function AdminStock() {
         <select
           className="admin-search-input"
           value={subCategory}
-          onChange={(e) =>
-            setSubCategory(e.target.value)
-          }
+          onChange={(e) => setSubCategory(e.target.value)}
         >
           <option value="all">All Types</option>
           {subOptions.map((item) => (
-            <option
-              key={item}
-              value={item.toLowerCase()}
-            >
+            <option key={item} value={item.toLowerCase()}>
               {item}
             </option>
           ))}
@@ -153,19 +138,12 @@ function AdminStock() {
           };
 
           const isEdited =
-            editStock[item._id] &&
-            Object.keys(editStock[item._id]).length > 0;
+            editStock[item._id] && Object.keys(editStock[item._id]).length > 0;
 
-          const hasLowStock =
-            Object.values(sizeStock).some(
-              (q) => q <= 2
-            );
+          const hasLowStock = Object.values(sizeStock).some((q) => q <= 2);
 
           return (
-            <div
-              key={item._id}
-              className="admin-stock-card"
-            >
+            <div key={item._id} className="admin-stock-card">
               <div className="stock-left">
                 <img src={item.image} alt={item.title} />
                 <div>
@@ -186,8 +164,7 @@ function AdminStock() {
                 <div className="size-input-row">
                   {["S", "M", "L", "XL"].map((size) => {
                     const value =
-                      editStock[item._id]?.[size] ??
-                      sizeStock[size];
+                      editStock[item._id]?.[size] ?? sizeStock[size];
 
                     const low = isLowStock(value);
                     const out = isOut(value);
@@ -199,10 +176,7 @@ function AdminStock() {
                         min="0"
                         value={Number(value)}
                         onChange={(e) => {
-                          const val = Math.max(
-                            0,
-                            Number(e.target.value) || 0
-                          );
+                          const val = Math.max(0, Number(e.target.value) || 0);
 
                           setEditStock((prev) => ({
                             ...prev,
@@ -220,18 +194,12 @@ function AdminStock() {
                   })}
                 </div>
 
-                {hasLowStock && (
-                  <p className="stock-alert">
-                    ⚠ Low stock
-                  </p>
-                )}
+                {hasLowStock && <p className="stock-alert">⚠ Low stock</p>}
 
                 {isEdited && (
                   <button
                     className="save-btn"
-                    onClick={() =>
-                      updateStock(item._id)
-                    }
+                    onClick={() => updateStock(item._id)}
                   >
                     Save
                   </button>

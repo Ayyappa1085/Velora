@@ -2,19 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import "./Searchbar.css";
 
-function MobileSearch({
-  setShowSearch,
-  query,
-  setQuery,
-}) {
+function MobileSearch({ setShowSearch, query, setQuery }) {
   const navigate = useNavigate();
   const boxRef = useRef(null);
 
-  const clean = (text) =>
-    text.toLowerCase().trim().replace(/\s+/g, " ");
+  const clean = (text) => text.toLowerCase().trim().replace(/\s+/g, " ");
 
-  const has = (q, words) =>
-    words.some((word) => q.includes(word));
+  const has = (q, words) => words.some((word) => q.includes(word));
 
   const closeSearch = () => {
     setShowSearch(false);
@@ -61,63 +55,36 @@ function MobileSearch({
     };
 
     const handleOutside = (e) => {
-      if (
-        boxRef.current &&
-        !boxRef.current.contains(e.target)
-      ) {
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
         closeSearch();
       }
     };
 
-    document.addEventListener(
-      "keydown",
-      handleKey
-    );
+    document.addEventListener("keydown", handleKey);
 
-    document.addEventListener(
-      "mousedown",
-      handleOutside
-    );
+    document.addEventListener("mousedown", handleOutside);
 
-    document.addEventListener(
-      "touchstart",
-      handleOutside
-    );
+    document.addEventListener("touchstart", handleOutside);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleKey
-      );
+      document.removeEventListener("keydown", handleKey);
 
-      document.removeEventListener(
-        "mousedown",
-        handleOutside
-      );
+      document.removeEventListener("mousedown", handleOutside);
 
-      document.removeEventListener(
-        "touchstart",
-        handleOutside
-      );
+      document.removeEventListener("touchstart", handleOutside);
     };
   }, []);
 
   return (
-    <div
-      className="search-container"
-      ref={boxRef}
-    >
+    <div className="search-container" ref={boxRef}>
       <input
         type="text"
         className="search-input active"
         placeholder="Search products..."
         value={query}
-        onChange={(e) =>
-          setQuery(e.target.value)
-        }
+        onChange={(e) => setQuery(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter")
-            handleSearch();
+          if (e.key === "Enter") handleSearch();
         }}
         autoFocus
       />

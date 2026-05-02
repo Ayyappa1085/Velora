@@ -3,10 +3,7 @@ import { FaShoppingBag } from "react-icons/fa";
 import { useBag } from "../BagContext";
 import { useWishlist } from "./WishlistContext";
 
-function ProductInfo({
-  product,
-  isWishlist = false,
-}) {
+function ProductInfo({ product, isWishlist = false }) {
   const { addToBag } = useBag();
   const { toggleWishlist } = useWishlist();
 
@@ -22,12 +19,10 @@ function ProductInfo({
     XL: 0,
   };
 
-  const allOut =
-    Object.values(sizeStock).every((qty) => qty === 0);
+  const allOut = Object.values(sizeStock).every((qty) => qty === 0);
 
   // 🔥 low stock indicator
-  const isLowStock = (size) =>
-    sizeStock[size] > 0 && sizeStock[size] <= 2;
+  const isLowStock = (size) => sizeStock[size] > 0 && sizeStock[size] <= 2;
 
   const handleSelectSize = (size) => {
     if (sizeStock[size] === 0) return;
@@ -55,9 +50,7 @@ function ProductInfo({
 
         {/* 🔥 disable icon when out */}
         <span
-          className={`plus-icon ${
-            allOut ? "disabled" : ""
-          }`}
+          className={`plus-icon ${allOut ? "disabled" : ""}`}
           onClick={() => {
             if (!allOut) {
               setShowSizes(!showSizes);
@@ -68,25 +61,15 @@ function ProductInfo({
         </span>
       </div>
 
-      <p className="subtitle">
-        {product.subtitle}
-      </p>
+      <p className="subtitle">{product.subtitle}</p>
 
       <div className="price">
-        <span className="new">
-          ₹{product.price}
-        </span>
-        <span className="old">
-          ₹{product.oldPrice}
-        </span>
+        <span className="new">₹{product.price}</span>
+        <span className="old">₹{product.oldPrice}</span>
       </div>
 
       {/* 🔴 GLOBAL OUT OF STOCK */}
-      {allOut && (
-        <p className="out-stock">
-          Out of Stock
-        </p>
-      )}
+      {allOut && <p className="out-stock">Out of Stock</p>}
 
       {/* ✅ SIZE PICKER */}
       {showSizes && !allOut && (
@@ -99,20 +82,14 @@ function ProductInfo({
               <button
                 key={size}
                 disabled={isOut}
-                className={`size-btn ${
-                  isOut ? "disabled-size" : ""
-                }`}
-                onClick={() =>
-                  handleSelectSize(size)
-                }
+                className={`size-btn ${isOut ? "disabled-size" : ""}`}
+                onClick={() => handleSelectSize(size)}
               >
                 {size}
 
                 {/* 🔥 LOW STOCK */}
                 {isLowStock(size) && (
-                  <span className="low-stock">
-                    Only {stock} left
-                  </span>
+                  <span className="low-stock">Only {stock} left</span>
                 )}
               </button>
             );

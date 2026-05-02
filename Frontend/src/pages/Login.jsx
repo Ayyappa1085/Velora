@@ -16,8 +16,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const closeTo =
-    location.state?.backgroundLocation?.pathname || "/";
+  const closeTo = location.state?.backgroundLocation?.pathname || "/";
 
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -95,7 +94,6 @@ function Login() {
           navigate("/account/profile", { replace: true });
         }
       }, 50);
-
     } catch (err) {
       toast.error("Server error. Try again.");
     } finally {
@@ -126,9 +124,7 @@ function Login() {
           type="text"
           placeholder="Email"
           value={email}
-          onChange={(e) =>
-            setEmail(e.target.value.toLowerCase())
-          }
+          onChange={(e) => setEmail(e.target.value.toLowerCase())}
         />
 
         <div className="password-field">
@@ -141,18 +137,14 @@ function Login() {
 
           <span
             className="eye-icon"
-            onClick={() =>
-              setShowPassword(!showPassword)
-            }
+            onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <FaEye /> : <FaEyeSlash />}
           </span>
         </div>
 
         <div className="forgot-wrap">
-          <span className="forgot-link">
-            Forgot Password?
-          </span>
+          <span className="forgot-link">Forgot Password?</span>
         </div>
 
         {error && (

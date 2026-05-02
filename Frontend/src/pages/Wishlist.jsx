@@ -18,10 +18,7 @@ function Wishlist() {
         </div>
       ) : (
         <div className="wishlist-grid">
-          <ProductGrid
-            products={wishlist}
-            isWishlist={true}
-          />
+          <ProductGrid products={wishlist} isWishlist={true} />
         </div>
       )}
     </div>

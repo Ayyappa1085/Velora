@@ -1,11 +1,7 @@
 import "./BagDrawer.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaTimes,
-  FaMinus,
-  FaPlus,
-} from "react-icons/fa";
+import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
 
 import { useBag } from "../BagContext";
 import Recommendations from "./Recommendations";
@@ -48,11 +44,9 @@ function BagDrawer() {
   };
 
   useEffect(() => {
-    document.body.style.overflow =
-      isBagOpen ? "hidden" : "auto";
+    document.body.style.overflow = isBagOpen ? "hidden" : "auto";
 
-    document.documentElement.style.overflow =
-      isBagOpen ? "hidden" : "auto";
+    document.documentElement.style.overflow = isBagOpen ? "hidden" : "auto";
 
     return () => {
       document.body.style.overflow = "auto";
@@ -90,9 +84,7 @@ function BagDrawer() {
     }
   };
 
-  const safeFinalTotal = Number.isFinite(finalTotal)
-    ? finalTotal
-    : totalPrice;
+  const safeFinalTotal = Number.isFinite(finalTotal) ? finalTotal : totalPrice;
 
   // ✅ CHECK BEFORE CHECKOUT
   const handleCheckout = () => {
@@ -115,17 +107,11 @@ function BagDrawer() {
   return (
     <>
       <div
-        className={`bag-overlay ${
-          isBagOpen ? "show" : ""
-        }`}
+        className={`bag-overlay ${isBagOpen ? "show" : ""}`}
         onClick={closeBag}
       />
 
-      <div
-        className={`bag-drawer ${
-          isBagOpen ? "open" : ""
-        }`}
-      >
+      <div className={`bag-drawer ${isBagOpen ? "open" : ""}`}>
         <div className="bag-header">
           <button onClick={closeBag}>
             <FaTimes />
@@ -138,9 +124,7 @@ function BagDrawer() {
             <div className="empty-wrap">
               <h3>Your bag is empty</h3>
               <p>Add something you love.</p>
-              <button onClick={closeBag}>
-                Continue Shopping
-              </button>
+              <button onClick={closeBag}>Continue Shopping</button>
             </div>
           ) : (
             <>
@@ -150,21 +134,14 @@ function BagDrawer() {
 
                 return (
                   <div className="bag-item" key={key}>
-                    <img
-                      src={item.product.image}
-                      alt={item.product.title}
-                    />
+                    <img src={item.product.image} alt={item.product.title} />
 
                     <div className="bag-info">
                       <h4>{item.product.title}</h4>
 
-                      <p className="bag-price">
-                        ₹{item.product.price}
-                      </p>
+                      <p className="bag-price">₹{item.product.price}</p>
 
-                      <div className="bag-size-pill">
-                        Size {item.size}
-                      </div>
+                      <div className="bag-size-pill">Size {item.size}</div>
 
                       <div className="qty-box">
                         <button
@@ -176,7 +153,7 @@ function BagDrawer() {
 
                             const res = await decreaseQty(
                               item.product._id,
-                              item.size
+                              item.size,
                             );
 
                             if (res?.error) {
@@ -213,7 +190,7 @@ function BagDrawer() {
 
                             const res = await increaseQty(
                               item.product._id,
-                              item.size
+                              item.size,
                             );
 
                             if (res?.error) {
@@ -241,17 +218,11 @@ function BagDrawer() {
                       </div>
 
                       {itemError[key] && (
-                        <p className="item-error">
-                          {itemError[key]}
-                        </p>
+                        <p className="item-error">{itemError[key]}</p>
                       )}
 
                       <div className="save-later">
-                        <button
-                          onClick={() =>
-                            handleSaveForLater(item)
-                          }
-                        >
+                        <button onClick={() => handleSaveForLater(item)}>
                           Save for later
                         </button>
                       </div>
@@ -265,10 +236,7 @@ function BagDrawer() {
                           if (isLoading) return;
 
                           setLoading(key, true);
-                          await removeFromBag(
-                            item.product._id,
-                            item.size
-                          );
+                          await removeFromBag(item.product._id, item.size);
                           setLoading(key, false);
                         }}
                       >
@@ -286,21 +254,13 @@ function BagDrawer() {
                   value={couponInput}
                   onChange={handleInputChange}
                 />
-                <button onClick={handleApplyCoupon}>
-                  Apply
-                </button>
+                <button onClick={handleApplyCoupon}>Apply</button>
               </div>
 
               <PriceSummary
                 totalPrice={totalPrice}
-                discountAmount={
-                  appliedCoupon ? discountAmount : 0
-                }
-                finalTotal={
-                  appliedCoupon
-                    ? safeFinalTotal
-                    : totalPrice
-                }
+                discountAmount={appliedCoupon ? discountAmount : 0}
+                finalTotal={appliedCoupon ? safeFinalTotal : totalPrice}
               />
 
               <Recommendations />
@@ -314,23 +274,14 @@ function BagDrawer() {
                       className="bag-item"
                       key={`${item.product._id}-${item.size}`}
                     >
-                      <img
-                        src={item.product.image}
-                        alt={item.product.title}
-                      />
+                      <img src={item.product.image} alt={item.product.title} />
 
                       <div className="bag-info">
                         <h4>{item.product.title}</h4>
 
-                        <p className="bag-price">
-                          ₹{item.product.price}
-                        </p>
+                        <p className="bag-price">₹{item.product.price}</p>
 
-                        <button
-                          onClick={() =>
-                            moveToBag(item)
-                          }
-                        >
+                        <button onClick={() => moveToBag(item)}>
                           Move to Bag
                         </button>
                       </div>
@@ -338,10 +289,7 @@ function BagDrawer() {
                       <div className="bag-actions">
                         <button
                           onClick={() =>
-                            removeFromSaved(
-                              item.product._id,
-                              item.size
-                            )
+                            removeFromSaved(item.product._id, item.size)
                           }
                         >
                           <FaTimes />
@@ -357,16 +305,9 @@ function BagDrawer() {
 
         {bag.length > 0 && (
           <div className="bag-footer">
-            <button
-              className="checkout-btn"
-              onClick={handleCheckout}
-            >
+            <button className="checkout-btn" onClick={handleCheckout}>
               CHECKOUT / ₹
-              {Math.round(
-                appliedCoupon
-                  ? safeFinalTotal
-                  : totalPrice
-              )}
+              {Math.round(appliedCoupon ? safeFinalTotal : totalPrice)}
             </button>
           </div>
         )}

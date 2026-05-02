@@ -7,34 +7,35 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const authRoutes = require("./routes/authRoutes");
 
-// 🔥 EXISTING
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const cartRoutes = require("./routes/cartRoutes");
-
-// 🔥 NEW (ADD THIS)
 const savedRoutes = require("./routes/savedRoutes");
+
+const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 
-// 🔥 REQUIRED (fix for rate-limit + proxy environments)
 app.set("trust proxy", 1);
 
 app.use(cors());
+
+// ✅ ONLY JSON (no webhook raw needed now)
 app.use(express.json());
 
-// ROUTES
+/* ================= ROUTES ================= */
+
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
 
-// 🔥 EXISTING
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
-
-// 🔥 NEW ROUTE (CRITICAL)
 app.use("/api/saved", savedRoutes);
 
-// 🔥 MONGODB CONNECTION
+app.use("/api/payment", paymentRoutes);
+
+/* ================= DB CONNECTION ================= */
+
 mongoose
   .connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000,
@@ -45,18 +46,20 @@ mongoose
     mongoose.connection.db
       .admin()
       .command({ ping: 1 })
-      .then(() =>
-        console.log("MongoDB Ready for operations")
-      )
+      .then(() => console.log("MongoDB Ready for operations"))
       .catch(() => console.log("Mongo ping failed"));
   })
   .catch((err) => {
     console.log("Mongo Error:", err);
   });
 
+/* ================= TEST ROUTE ================= */
+
 app.get("/", (req, res) => {
   res.send("Velora Backend Running");
 });
+
+/* ================= SERVER ================= */
 
 const PORT = process.env.PORT || 5000;
 

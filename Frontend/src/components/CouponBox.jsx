@@ -2,14 +2,11 @@ import { useState } from "react";
 import { useBag } from "../BagContext";
 
 function CouponBox() {
-  const { coupon, applyCoupon } =
-    useBag();
+  const { coupon, applyCoupon } = useBag();
 
-  const [code, setCode] =
-    useState("");
+  const [code, setCode] = useState("");
 
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
   const coupons = {
     SAVE10: 10,
@@ -18,8 +15,7 @@ function CouponBox() {
   };
 
   const handleApply = () => {
-    const clean =
-      code.trim().toUpperCase();
+    const clean = code.trim().toUpperCase();
 
     if (!clean) {
       setMessage("Enter coupon code");
@@ -30,9 +26,7 @@ function CouponBox() {
       applyCoupon(clean);
 
       // 🔥 FIX: only show success after applying
-      setMessage(
-        `${coupons[clean]}% discount applied`
-      );
+      setMessage(`${coupons[clean]}% discount applied`);
     } else {
       setMessage("Invalid coupon code");
     }
@@ -54,14 +48,10 @@ function CouponBox() {
       {coupon?.code ? (
         <div className="coupon-applied">
           <span>
-            {coupon.code} (
-            {coupon.discount}% OFF)
+            {coupon.code} ({coupon.discount}% OFF)
           </span>
 
-          <button
-            type="button"
-            onClick={removeCoupon}
-          >
+          <button type="button" onClick={removeCoupon}>
             ✕
           </button>
         </div>
@@ -71,35 +61,21 @@ function CouponBox() {
             type="text"
             placeholder="Enter code"
             value={code}
-            onChange={(e) =>
-              setCode(
-                e.target.value
-              )
-            }
+            onChange={(e) => setCode(e.target.value)}
             onKeyDown={(e) => {
-              if (
-                e.key ===
-                "Enter"
-              ) {
+              if (e.key === "Enter") {
                 handleApply();
               }
             }}
           />
 
-          <button
-            type="button"
-            onClick={handleApply}
-          >
+          <button type="button" onClick={handleApply}>
             Apply
           </button>
         </div>
       )}
 
-      {message && (
-        <p className="coupon-msg">
-          {message}
-        </p>
-      )}
+      {message && <p className="coupon-msg">{message}</p>}
     </div>
   );
 }

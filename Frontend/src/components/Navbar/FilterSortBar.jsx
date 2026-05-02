@@ -1,7 +1,4 @@
-import {
-  useState,
-  useEffect,
-} from "react";
+import { useState, useEffect } from "react";
 
 function FilterSortBar({
   onSortClick,
@@ -10,8 +7,7 @@ function FilterSortBar({
   filters,
   setFilters,
 }) {
-  const [showFilter, setShowFilter] =
-    useState(false);
+  const [showFilter, setShowFilter] = useState(false);
 
   const chooseSort = (type) => {
     setSortType(type);
@@ -28,16 +24,10 @@ function FilterSortBar({
     setShowFilter(!showFilter);
   };
 
-  const applyFilter = (
-    key,
-    value
-  ) => {
+  const applyFilter = (key, value) => {
     setFilters((prev) => ({
       ...prev,
-      [key]:
-        prev[key] === value
-          ? ""
-          : value,
+      [key]: prev[key] === value ? "" : value,
     }));
   };
 
@@ -56,163 +46,68 @@ function FilterSortBar({
       onSortClick(false);
     };
 
-    window.addEventListener(
-      "scroll",
-      closeMenus,
-      { passive: true }
-    );
+    window.addEventListener("scroll", closeMenus, { passive: true });
 
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        closeMenus
-      );
+    return () => window.removeEventListener("scroll", closeMenus);
   }, [onSortClick]);
 
   return (
     <div className="filter-sort-wrap">
-
       {/* FILTER */}
       <div className="sort-box">
-        <a onClick={toggleFilter}>
-          FILTER
-        </a>
+        <a onClick={toggleFilter}>FILTER</a>
 
         {showFilter && (
           <div className="sort-menu filter-menu">
+            <div className="menu-title">Price Range</div>
 
-            <div className="menu-title">
-              Price Range
-            </div>
+            <div onClick={() => applyFilter("price", "0-999")}>₹0 - ₹999</div>
 
-            <div
-              onClick={() =>
-                applyFilter(
-                  "price",
-                  "0-999"
-                )
-              }
-            >
-              ₹0 - ₹999
-            </div>
-
-            <div
-              onClick={() =>
-                applyFilter(
-                  "price",
-                  "1000-1999"
-                )
-              }
-            >
+            <div onClick={() => applyFilter("price", "1000-1999")}>
               ₹1000 - ₹1999
             </div>
 
-            <div
-              onClick={() =>
-                applyFilter(
-                  "price",
-                  "2000+"
-                )
-              }
-            >
-              ₹2000+
-            </div>
+            <div onClick={() => applyFilter("price", "2000+")}>₹2000+</div>
 
-            <div className="menu-title">
-              Size
-            </div>
+            <div className="menu-title">Size</div>
 
-            {["S", "M", "L", "XL"].map(
-              (size) => (
-                <div
-                  key={size}
-                  onClick={() =>
-                    applyFilter(
-                      "size",
-                      size
-                    )
-                  }
-                >
-                  {size}
-                </div>
-              )
-            )}
+            {["S", "M", "L", "XL"].map((size) => (
+              <div key={size} onClick={() => applyFilter("size", size)}>
+                {size}
+              </div>
+            ))}
 
-            <div className="menu-title">
-              Color
-            </div>
+            <div className="menu-title">Color</div>
 
-            {[
-              "Black",
-              "White",
-              "Blue",
-              "Grey",
-            ].map((color) => (
+            {["Black", "White", "Blue", "Grey"].map((color) => (
               <div
                 key={color}
-                onClick={() =>
-                  applyFilter(
-                    "color",
-                    color.toLowerCase()
-                  )
-                }
+                onClick={() => applyFilter("color", color.toLowerCase())}
               >
                 {color}
               </div>
             ))}
 
-            <div
-              className="clear-btn"
-              onClick={clearAll}
-            >
+            <div className="clear-btn" onClick={clearAll}>
               Clear Filters
             </div>
-
           </div>
         )}
       </div>
 
       {/* SORT */}
       <div className="sort-box">
-        <a onClick={toggleSort}>
-          SORT
-        </a>
+        <a onClick={toggleSort}>SORT</a>
 
         {showSortMenu && (
           <div className="sort-menu">
+            <div onClick={() => chooseSort("low")}>Price Low to High</div>
 
-            <div
-              onClick={() =>
-                chooseSort("low")
-              }
-            >
-              Price Low to High
-            </div>
+            <div onClick={() => chooseSort("high")}>Price High to Low</div>
 
-            <div
-              onClick={() =>
-                chooseSort("high")
-              }
-            >
-              Price High to Low
-            </div>
+            <div onClick={() => chooseSort("az")}>Name A-Z</div>
 
-            <div
-              onClick={() =>
-                chooseSort("az")
-              }
-            >
-              Name A-Z
-            </div>
-
-            <div
-              onClick={() =>
-                chooseSort("za")
-              }
-            >
-              Name Z-A
-            </div>
-
+            <div onClick={() => chooseSort("za")}>Name Z-A</div>
           </div>
         )}
       </div>

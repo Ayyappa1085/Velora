@@ -24,11 +24,7 @@ function Content() {
             <p>{OFFERS[index].text}</p>
           </div>
 
-          <OfferDots
-            offers={OFFERS}
-            index={index}
-            setIndex={setIndex}
-          />
+          <OfferDots offers={OFFERS} index={index} setIndex={setIndex} />
         </div>
       </div>
     </div>

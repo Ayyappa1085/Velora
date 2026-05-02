@@ -9,7 +9,7 @@
   background: #fff;
   border-radius: 22px;
   padding: 22px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
 .product-form-card h2,
@@ -95,7 +95,7 @@
 
 .admin-product-grid {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
@@ -108,7 +108,7 @@
 
 .admin-product-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.05);
 }
 
 .admin-product-card img {
@@ -167,7 +167,7 @@
   }
 
   .admin-product-grid {
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

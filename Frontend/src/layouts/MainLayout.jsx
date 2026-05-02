@@ -8,12 +8,7 @@ function MainLayout() {
   const location = useLocation();
   const path = location.pathname.toLowerCase();
 
-  const categoryRoots = [
-    "/men",
-    "/women",
-    "/kids",
-    "/footwear",
-  ];
+  const categoryRoots = ["/men", "/women", "/kids", "/footwear"];
 
   const hideFooter =
     path === "/wishlist" ||
@@ -28,31 +23,22 @@ function MainLayout() {
     categoryRoots.includes(path);
 
   useEffect(() => {
-    const isMobile =
-      window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 768;
 
     const lockScroll =
-  (isMobile &&
-    categoryRoots.includes(path)) ||
-  path.startsWith("/account");
+      (isMobile && categoryRoots.includes(path)) || path.startsWith("/account");
 
     if (lockScroll) {
-      document.documentElement.style.overflow =
-        "hidden";
-      document.body.style.overflow =
-        "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
     } else {
-      document.documentElement.style.overflow =
-        "";
-      document.body.style.overflow =
-        "";
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.documentElement.style.overflow =
-        "";
-      document.body.style.overflow =
-        "";
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     };
   }, [path]);
 

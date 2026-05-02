@@ -9,13 +9,11 @@ import { BagProvider } from "./BagContext";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
-   
-        <BagProvider>
-          <WishlistProvider>
-            <App />
-          </WishlistProvider>
-        </BagProvider>
-      
+      <BagProvider>
+        <WishlistProvider>
+          <App />
+        </WishlistProvider>
+      </BagProvider>
     </AuthProvider>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

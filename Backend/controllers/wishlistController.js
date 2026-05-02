@@ -40,7 +40,7 @@ const toggleWishlist = async (req, res) => {
 
     if (exists) {
       wishlist.products = wishlist.products.filter(
-        (id) => id.toString() !== productId
+        (id) => id.toString() !== productId,
       );
     } else {
       wishlist.products.push(productId);

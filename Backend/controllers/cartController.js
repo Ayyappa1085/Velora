@@ -27,7 +27,6 @@ const addToCart = async (req, res) => {
   try {
     const { productId, size, quantity = 1 } = req.body;
 
-    // 🔥 VALIDATION
     if (!productId || !size) {
       return res.status(400).json({ message: "Invalid data" });
     }
@@ -42,9 +41,7 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // 🔥 STOCK CHECK
-    const availableStock =
-      product.sizeStock?.[size] ?? product.stock;
+    const availableStock = product.sizeStock?.[size] ?? product.stock;
 
     if (availableStock <= 0) {
       return res.status(400).json({
@@ -64,15 +61,11 @@ const addToCart = async (req, res) => {
     }
 
     const index = cart.items.findIndex(
-      (item) =>
-        item.product.toString() === productId &&
-        item.size === size
+      (item) => item.product.toString() === productId && item.size === size,
     );
 
-    const existingQty =
-      index > -1 ? cart.items[index].quantity : 0;
+    const existingQty = index > -1 ? cart.items[index].quantity : 0;
 
-    // 🔥 PREVENT OVER-ADDING
     if (existingQty + quantity > availableStock) {
       return res.status(400).json({
         message: `Only ${availableStock} items available`,
@@ -114,11 +107,7 @@ const removeFromCart = async (req, res) => {
     if (!cart) return res.json([]);
 
     cart.items = cart.items.filter(
-      (item) =>
-        !(
-          item.product.toString() === productId &&
-          item.size === size
-        )
+      (item) => !(item.product.toString() === productId && item.size === size),
     );
 
     await cart.save();
@@ -150,10 +139,8 @@ const updateQuantity = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const availableStock =
-      product.sizeStock?.[size] ?? product.stock;
+    const availableStock = product.sizeStock?.[size] ?? product.stock;
 
-    // 🔥 BLOCK EXCEEDING STOCK
     if (quantity > availableStock) {
       return res.status(400).json({
         message: `Only ${availableStock} available`,
@@ -161,9 +148,7 @@ const updateQuantity = async (req, res) => {
     }
 
     const item = cart.items.find(
-      (i) =>
-        i.product.toString() === productId &&
-        i.size === size
+      (i) => i.product.toString() === productId && i.size === size,
     );
 
     if (item) {
@@ -182,9 +167,31 @@ const updateQuantity = async (req, res) => {
   }
 };
 
+/* ================= 🔥 NEW: CLEAR CART ================= */
+const clearCart = async (req, res) => {
+  try {
+    let cart = await Cart.findOne({
+      user: req.user._id,
+    });
+
+    if (!cart) {
+      return res.json([]);
+    }
+
+    cart.items = [];
+    await cart.save();
+
+    res.json([]);
+  } catch (error) {
+    console.log("CLEAR CART ERROR:", error);
+    res.status(500).json({ message: "Clear cart failed" });
+  }
+};
+
 module.exports = {
   getCart,
   addToCart,
   removeFromCart,
   updateQuantity,
+  clearCart, // ✅ EXPORT ADDED
 };

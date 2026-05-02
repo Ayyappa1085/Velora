@@ -30,16 +30,13 @@ function App() {
   const backgroundLocation = state?.backgroundLocation;
 
   const isAuthRoute =
-    location.pathname === "/login" ||
-    location.pathname === "/register";
+    location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <>
       <Routes
         location={
-          backgroundLocation && isAuthRoute
-            ? backgroundLocation
-            : location
+          backgroundLocation && isAuthRoute ? backgroundLocation : location
         }
       >
         {/* ================= ADMIN ================= */}

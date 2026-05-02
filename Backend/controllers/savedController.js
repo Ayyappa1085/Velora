@@ -37,9 +37,7 @@ const addToSaved = async (req, res) => {
     }
 
     const exists = saved.items.some(
-      (item) =>
-        item.product.toString() === productId &&
-        item.size === size
+      (item) => item.product.toString() === productId && item.size === size,
     );
 
     if (!exists) {
@@ -73,11 +71,7 @@ const removeFromSaved = async (req, res) => {
     if (!saved) return res.json([]);
 
     saved.items = saved.items.filter(
-      (item) =>
-        !(
-          item.product.toString() === productId &&
-          item.size === size
-        )
+      (item) => !(item.product.toString() === productId && item.size === size),
     );
 
     await saved.save();

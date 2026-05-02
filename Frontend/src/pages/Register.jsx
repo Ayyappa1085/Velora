@@ -17,8 +17,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const closeTo =
-    location.state?.backgroundLocation?.pathname || "/";
+  const closeTo = location.state?.backgroundLocation?.pathname || "/";
 
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -93,7 +92,6 @@ function Register() {
         state: location.state,
         replace: true,
       });
-
     } catch {
       toast.error("Server error. Try again.");
     }
@@ -150,16 +148,12 @@ function Register() {
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
             value={confirmPassword}
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
           <span
             className="eye-icon"
-            onClick={() =>
-              setShowConfirmPassword(!showConfirmPassword)
-            }
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
           </span>
@@ -178,9 +172,7 @@ function Register() {
         )}
 
         {/* ✅ IMPORTANT */}
-        <button type="submit">
-          Register
-        </button>
+        <button type="submit">Register</button>
 
         <p>
           Already have an account?{" "}

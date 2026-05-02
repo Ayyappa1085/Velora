@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// ❌ REMOVE axios
+// import axios from "axios";
 import "../../styles/AdminProducts.css";
 import { CATEGORY_ITEMS } from "../../data/categories";
 
-const API = "http://localhost:5000/api/products";
-const LOAD_API = "http://localhost:5000/api/products?limit=1000";
+// ✅ ADD API
+import api from "../../utils/api";
+
+const API = "/api/products";
+const LOAD_API = "/api/products?limit=1000";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -25,14 +29,14 @@ function AdminProducts() {
     image: null,
   });
 
-  const getToken = () =>
-    localStorage.getItem("token");
+  // ⚠️ KEEP (not breaking structure)
+  const getToken = () => localStorage.getItem("token");
 
   const loadProducts = async () => {
     try {
       setLoading(true);
 
-      const res = await axios.get(LOAD_API);
+      const res = await api.get(LOAD_API);
 
       setProducts(res.data.products || []);
     } catch (error) {
@@ -91,8 +95,6 @@ function AdminProducts() {
     e.preventDefault();
 
     try {
-      const token = getToken();
-
       const data = new FormData();
 
       data.append("title", form.title);
@@ -108,29 +110,19 @@ function AdminProducts() {
       }
 
       if (editId) {
-        await axios.put(
-          `${API}/${editId}`,
-          {
-            title: form.title,
-            subtitle: form.subtitle,
-            price: form.price,
-            oldPrice: form.oldPrice,
-            category: form.category,
-            type: form.type,
-            stock: Number(form.stock),
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        await axios.post(API, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // ✅ UPDATE
+        await api.put(`${API}/${editId}`, {
+          title: form.title,
+          subtitle: form.subtitle,
+          price: form.price,
+          oldPrice: form.oldPrice,
+          category: form.category,
+          type: form.type,
+          stock: Number(form.stock),
         });
+      } else {
+        // ✅ CREATE
+        await api.post(API, data);
       }
 
       resetForm();
@@ -151,9 +143,7 @@ function AdminProducts() {
       category: item.category,
       type: item.type,
 
-      // 🔥 FIX
       stock: item.sizeStock?.S ?? item.stock,
-
       image: null,
     });
 
@@ -165,14 +155,7 @@ function AdminProducts() {
 
   const handleDelete = async (id) => {
     try {
-      const token = getToken();
-
-      await axios.delete(`${API}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      await api.delete(`${API}/${id}`);
       loadProducts();
     } catch (error) {
       console.log(error);
@@ -180,16 +163,12 @@ function AdminProducts() {
   };
 
   const subOptions =
-    categoryFilter === "all"
-      ? []
-      : CATEGORY_ITEMS[categoryFilter] || [];
+    categoryFilter === "all" ? [] : CATEGORY_ITEMS[categoryFilter] || [];
 
   const filtered = products.filter((item) => {
-    const text =
-      `${item.title} ${item.type}`.toLowerCase();
+    const text = `${item.title} ${item.type}`.toLowerCase();
 
-    const matchSearch =
-      text.includes(search.toLowerCase());
+    const matchSearch = text.includes(search.toLowerCase());
 
     const matchCategory =
       categoryFilter === "all" ||
@@ -199,28 +178,18 @@ function AdminProducts() {
       subCategoryFilter === "all" ||
       item.type.toLowerCase() === subCategoryFilter;
 
-    return (
-      matchSearch &&
-      matchCategory &&
-      matchSubCategory
-    );
+    return matchSearch && matchCategory && matchSubCategory;
   });
 
   const visibleProducts =
-    search ||
-    categoryFilter !== "all" ||
-    subCategoryFilter !== "all"
+    search || categoryFilter !== "all" || subCategoryFilter !== "all"
       ? filtered
       : filtered.slice(0, 6);
 
   return (
     <div className="admin-products-page">
       <div className="product-form-card">
-        <h2>
-          {editId
-            ? "Edit Product"
-            : "Add Product"}
-        </h2>
+        <h2>{editId ? "Edit Product" : "Add Product"}</h2>
 
         <form onSubmit={handleSubmit}>
           <input
@@ -255,25 +224,15 @@ function AdminProducts() {
             onChange={handleChange}
           />
 
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-          >
+          <select name="category" value={form.category} onChange={handleChange}>
             <option value="Men">Men</option>
             <option value="Women">Women</option>
             <option value="Kids">Kids</option>
             <option value="Footwear">Footwear</option>
           </select>
 
-          <select
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-          >
-            {CATEGORY_ITEMS[
-              form.category.toLowerCase()
-            ]?.map((item) => (
+          <select name="type" value={form.type} onChange={handleChange}>
+            {CATEGORY_ITEMS[form.category.toLowerCase()]?.map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -296,18 +255,10 @@ function AdminProducts() {
           />
 
           <div className="form-btns">
-            <button type="submit">
-              {editId
-                ? "Update"
-                : "Add Product"}
-            </button>
+            <button type="submit">{editId ? "Update" : "Add Product"}</button>
 
             {editId && (
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={resetForm}
-              >
+              <button type="button" className="cancel-btn" onClick={resetForm}>
                 Cancel
               </button>
             )}
@@ -318,9 +269,7 @@ function AdminProducts() {
       <div className="products-list-card">
         <div className="list-head">
           <h2>Products</h2>
-          <span>
-            {visibleProducts.length} items
-          </span>
+          <span>{visibleProducts.length} items</span>
         </div>
 
         <div className="toolbar">
@@ -328,9 +277,7 @@ function AdminProducts() {
             type="text"
             placeholder="Search..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
           />
 
           <select
@@ -349,17 +296,12 @@ function AdminProducts() {
 
           <select
             value={subCategoryFilter}
-            onChange={(e) =>
-              setSubCategoryFilter(e.target.value)
-            }
+            onChange={(e) => setSubCategoryFilter(e.target.value)}
           >
             <option value="all">All Types</option>
 
             {subOptions.map((item) => (
-              <option
-                key={item}
-                value={item.toLowerCase()}
-              >
+              <option key={item} value={item.toLowerCase()}>
                 {item}
               </option>
             ))}
@@ -367,24 +309,14 @@ function AdminProducts() {
         </div>
 
         {loading ? (
-          <div className="empty-products">
-            Loading...
-          </div>
+          <div className="empty-products">Loading...</div>
         ) : visibleProducts.length === 0 ? (
-          <div className="empty-products">
-            No products found.
-          </div>
+          <div className="empty-products">No products found.</div>
         ) : (
           <div className="admin-product-grid">
             {visibleProducts.map((item) => (
-              <div
-                className="admin-product-card"
-                key={item._id}
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                />
+              <div className="admin-product-card" key={item._id}>
+                <img src={item.image} alt={item.title} />
 
                 <h3>{item.title}</h3>
 
@@ -394,25 +326,16 @@ function AdminProducts() {
                   {item.category} / {item.type}
                 </small>
 
-                {/* 🔥 FIX */}
                 <div className="stock-tag">
                   Stock: {item.sizeStock?.S ?? item.stock}
                 </div>
 
                 <div className="card-actions">
-                  <button
-                    onClick={() =>
-                      handleEdit(item)
-                    }
-                  >
-                    Edit
-                  </button>
+                  <button onClick={() => handleEdit(item)}>Edit</button>
 
                   <button
                     className="delete-btn"
-                    onClick={() =>
-                      handleDelete(item._id)
-                    }
+                    onClick={() => handleDelete(item._id)}
                   >
                     Delete
                   </button>

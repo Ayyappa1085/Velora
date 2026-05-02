@@ -8,10 +8,7 @@ const {
   logoutUser, // 🔥 ADDED
 } = require("../controllers/authController");
 
-const {
-  protect,
-  adminOnly,
-} = require("../middleware/authMiddleware");
+const { protect, adminOnly } = require("../middleware/authMiddleware");
 
 const rateLimit = require("express-rate-limit");
 

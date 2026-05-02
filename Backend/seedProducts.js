@@ -3,36 +3,23 @@ require("dotenv").config();
 
 const Product = require("./models/Product");
 
-const createItems = (
-  titles,
-  category,
-  type,
-  images,
-  basePrice
-) => {
-  return titles.map(
-    (title, index) => {
-      const price =
-        basePrice +
-        index * 100;
+const createItems = (titles, category, type, images, basePrice) => {
+  return titles.map((title, index) => {
+    const price = basePrice + index * 100;
 
-      const oldPrice =
-        price * 2;
+    const oldPrice = price * 2;
 
-      return {
-        title,
-        subtitle:
-          "Premium Collection",
-        price,
-        oldPrice,
-        category,
-        type,
-        image:
-          images[index],
-        stock: 10,
-      };
-    }
-  );
+    return {
+      title,
+      subtitle: "Premium Collection",
+      price,
+      oldPrice,
+      category,
+      type,
+      image: images[index],
+      stock: 10,
+    };
+  });
 };
 
 const menShirtImages = [
@@ -112,7 +99,7 @@ const products = [
     "Men",
     "Shirts",
     menShirtImages,
-    999
+    999,
   ),
 
   ...createItems(
@@ -129,7 +116,7 @@ const products = [
     "Men",
     "Jeans",
     menJeansImages,
-    1399
+    1399,
   ),
 
   ...createItems(
@@ -146,7 +133,7 @@ const products = [
     "Women",
     "Kurtas",
     womenKurtaImages,
-    899
+    899,
   ),
 
   ...createItems(
@@ -163,7 +150,7 @@ const products = [
     "Women",
     "Sarees",
     womenSareeImages,
-    1299
+    1299,
   ),
 
   ...createItems(
@@ -180,7 +167,7 @@ const products = [
     "Kids",
     "Shirts",
     kidsShirtImages,
-    499
+    499,
   ),
 
   ...createItems(
@@ -193,46 +180,32 @@ const products = [
     "Kids",
     "Pants",
     kidsJeansImages,
-    699
+    699,
   ),
 ];
 
-const seedProducts =
-  async () => {
-    try {
-      await mongoose.connect(
-        process.env.MONGO_URI
-      );
+const seedProducts = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
 
-      await Product.deleteMany();
+    await Product.deleteMany();
 
-      const finalData =
-        products.map(
-          (item) => ({
-            ...item,
-            discount:
-              Math.round(
-                ((item.oldPrice -
-                  item.price) /
-                  item.oldPrice) *
-                  100
-              ),
-          })
-        );
+    const finalData = products.map((item) => ({
+      ...item,
+      discount: Math.round(
+        ((item.oldPrice - item.price) / item.oldPrice) * 100,
+      ),
+    }));
 
-      await Product.insertMany(
-        finalData
-      );
+    await Product.insertMany(finalData);
 
-      console.log(
-        "All Products Seeded Successfully"
-      );
+    console.log("All Products Seeded Successfully");
 
-      process.exit();
-    } catch (error) {
-      console.log(error);
-      process.exit(1);
-    }
-  };
+    process.exit();
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
 
 seedProducts();

@@ -2,33 +2,38 @@ const mongoose = require("mongoose");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
+// ✅ NEW (ONLY ADDITION)
+const Cart = require("../models/Cart");
+
 /* ================= GENERATE ORDER ID ================= */
 const generateOrderId = () => {
-  const num = Math.floor(
-    1000000000 + Math.random() * 9000000000
-  );
+  const num = Math.floor(1000000000 + Math.random() * 9000000000);
   return `VLR${num}`;
 };
 
-/* ================= CREATE ORDER (FULL SAFE) ================= */
+/* ================= CREATE ORDER (FULL SAFE + FIXED) ================= */
 const createOrder = async (req, res) => {
   const session = await mongoose.startSession();
 
   try {
+    let createdOrder = null;
+
     await session.withTransaction(async () => {
-      const { items = [], idempotencyKey } = req.body;
+      const { items = [], idempotencyKey, paymentInfo } = req.body;
 
       if (!items.length) {
         throw new Error("No items in order");
       }
 
+      /* ================= IDEMPOTENCY ================= */
       if (idempotencyKey) {
         const existing = await Order.findOne({
           idempotencyKey,
         }).session(session);
 
         if (existing) {
-          return res.status(200).json(existing);
+          createdOrder = existing;
+          return;
         }
       }
 
@@ -40,13 +45,11 @@ const createOrder = async (req, res) => {
         exists = await Order.findOne({ orderId }).session(session);
       }
 
-      /* ================= STOCK CONTROL ================= */
+      /* ================= PRE-CHECK STOCK ================= */
       for (const item of items) {
-        const productId =
-          item.productId || item.product;
-
-        const qty =
-          item.qty || item.quantity;
+        const productId = item.productId || item.product;
+        const qty = item.qty || item.quantity;
+        const size = item.size;
 
         const product = await Product.findById(productId).session(session);
 
@@ -54,11 +57,20 @@ const createOrder = async (req, res) => {
           throw new Error("Product not found");
         }
 
+        const available = product.sizeStock?.[size] || 0;
+
+        if (available < qty) {
+          throw new Error(`${product.title} (${size}) only ${available} left`);
+        }
+      }
+
+      /* ================= STOCK CONTROL ================= */
+      for (const item of items) {
+        const productId = item.productId || item.product;
+        const qty = item.qty || item.quantity;
         const size = item.size;
 
-        if (!["S", "M", "L", "XL"].includes(size)) {
-          throw new Error("Invalid size");
-        }
+        const product = await Product.findById(productId).session(session);
 
         const result = await Product.updateOne(
           {
@@ -70,12 +82,28 @@ const createOrder = async (req, res) => {
               [`sizeStock.${size}`]: -qty,
             },
           },
-          { session }
+          { session },
         );
 
         if (result.modifiedCount === 0) {
           throw new Error(`${product.title} (${size}) sold out`);
         }
+      }
+
+      /* ================= TOTAL CALCULATION ================= */
+      let calculatedTotal = 0;
+
+      for (const item of items) {
+        const productId = item.productId || item.product;
+        const qty = item.qty || item.quantity;
+
+        const product = await Product.findById(productId).session(session);
+
+        if (!product) {
+          throw new Error("Product not found");
+        }
+
+        calculatedTotal += product.price * qty;
       }
 
       /* ================= NORMALIZE ITEMS ================= */
@@ -96,14 +124,24 @@ const createOrder = async (req, res) => {
             orderId,
             user: req.user.id,
             idempotencyKey: idempotencyKey || undefined,
+            paymentInfo: paymentInfo || null,
+            totalAmount: calculatedTotal,
           },
         ],
-        { session }
+        { session },
       );
 
-      res.status(201).json(order[0]);
+      createdOrder = order[0];
+
+      /* ================= 🔥 CLEAR CART (FINAL FIX) ================= */
+      await Cart.updateOne(
+        { user: req.user.id },
+        { $set: { items: [] } },
+        { session },
+      );
     });
 
+    res.status(201).json(createdOrder);
   } catch (error) {
     console.log("ORDER ERROR:", error.message);
 
@@ -147,10 +185,7 @@ const getOrderById = async (req, res) => {
       });
     }
 
-    if (
-      order.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
-    ) {
+    if (order.user.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(403).json({
         message: "Access denied",
       });
@@ -164,7 +199,7 @@ const getOrderById = async (req, res) => {
   }
 };
 
-/* ================= UPDATE ORDER STATUS (FIXED) ================= */
+/* ================= UPDATE ORDER STATUS ================= */
 const updateOrderStatus = async (req, res) => {
   try {
     let { status } = req.body;
@@ -175,10 +210,7 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // ✅ Normalize (important)
-    status =
-      status.charAt(0).toUpperCase() +
-      status.slice(1).toLowerCase();
+    status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
     const allowed = [
       "Placed",
@@ -197,7 +229,7 @@ const updateOrderStatus = async (req, res) => {
     const updated = await Order.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { new: true },
     );
 
     if (!updated) {

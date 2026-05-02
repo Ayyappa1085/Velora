@@ -15,7 +15,7 @@ async function run() {
           "sizeStock.L": 10,
           "sizeStock.XL": 10,
         },
-      }
+      },
     );
 
     console.log("Updated:", result.modifiedCount);

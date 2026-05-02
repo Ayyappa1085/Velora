@@ -8,7 +8,7 @@
   background: #fff;
   padding: 22px;
   border-radius: 20px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -41,7 +41,7 @@
   background: #fff;
   border-radius: 20px;
   padding: 14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
 }
 
@@ -107,7 +107,7 @@
     background: #fff;
     border-radius: 18px;
     padding: 16px;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
   }
 
   .user-head {

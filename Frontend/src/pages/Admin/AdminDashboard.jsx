@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// ❌ REMOVE axios
+// import axios from "axios";
 import "../../styles/AdminOrders.css";
+
+// ✅ ADD API
+import api from "../../utils/api";
 
 function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -25,61 +29,49 @@ function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const token = localStorage.getItem("token");
+      // ❌ REMOVE token logic
+      // const token = localStorage.getItem("token");
 
       const [productRes, orderRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/products?limit=1000"),
+        // ✅ FIXED
+        api.get("/api/products?limit=1000"),
 
-        // 🔥 FIX: add token
-        axios.get("http://localhost:5000/api/orders", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
+        // ✅ FIXED
+        api.get("/api/orders"),
       ]);
 
       const products = productRes.data.products || [];
 
-      // 🔥 FIX SAFE PARSE
+      // 🔥 SAFE PARSE
       const allOrders = Array.isArray(orderRes.data)
         ? orderRes.data
         : orderRes.data.orders || [];
 
       // 💰 REVENUE
       const revenue = allOrders
-        .filter((o) =>
-          ["Confirmed", "Shipped", "Delivered"].includes(o.status)
-        )
-        .reduce(
-          (sum, item) =>
-            sum + Number(item.totalAmount || 0),
-          0
-        );
+        .filter((o) => ["Confirmed", "Shipped", "Delivered"].includes(o.status))
+        .reduce((sum, item) => sum + Number(item.totalAmount || 0), 0);
 
       // 🔥 LOW STOCK
       const lowStock = products.filter((p) => {
         const stock = p.sizeStock || {};
-        return Object.values(stock).some(
-          (q) => q > 0 && q <= 2
-        );
+        return Object.values(stock).some((q) => q > 0 && q <= 2);
       }).length;
 
       // 🔥 OUT OF STOCK
       const outOfStock = products.filter((p) => {
         const stock = p.sizeStock || {};
-        return Object.values(stock).every(
-          (q) => q === 0
-        );
+        return Object.values(stock).every((q) => q === 0);
       }).length;
 
       setStats({
         products: products.length,
         orders: allOrders.length,
         pending: allOrders.filter((o) =>
-          ["Placed", "Pending"].includes(o.status)
+          ["Placed", "Pending"].includes(o.status),
         ).length,
         cancelled: allOrders.filter((o) =>
-          ["Cancelled", "Failed"].includes(o.status)
+          ["Cancelled", "Failed"].includes(o.status),
         ).length,
         revenue: Math.round(revenue),
         lowStock,
@@ -98,9 +90,7 @@ function AdminDashboard() {
     if (!searchId.trim()) return;
 
     const result = orders.find((item) => {
-      const id = (item.orderId || item._id || "")
-        .toString()
-        .toLowerCase();
+      const id = (item.orderId || item._id || "").toString().toLowerCase();
 
       return id === searchId.trim().toLowerCase();
     });
@@ -144,34 +134,41 @@ function AdminDashboard() {
             className="admin-search-input"
             placeholder="Enter Order ID"
             value={searchId}
-            onChange={(e) =>
-              setSearchId(e.target.value)
-            }
+            onChange={(e) => setSearchId(e.target.value)}
           />
 
-          <button
-            className="admin-search-btn"
-            onClick={handleSearch}
-          >
+          <button className="admin-search-btn" onClick={handleSearch}>
             Search
           </button>
         </div>
 
         {foundOrder === false && (
-          <div className="admin-order-result">
-            Order not found
-          </div>
+          <div className="admin-order-result">Order not found</div>
         )}
 
         {foundOrder && (
           <div className="admin-order-result admin-order-layout">
             <div className="admin-order-left">
-              <p><strong>Order ID:</strong> {foundOrder.orderId || foundOrder._id}</p>
-              <p><strong>Name:</strong> {foundOrder.customerName}</p>
-              <p><strong>Phone:</strong> {foundOrder.phone}</p>
-              <p><strong>Address:</strong> {foundOrder.address}</p>
-              <p><strong>Status:</strong> {foundOrder.status}</p>
-              <p><strong>Total:</strong> ₹{Math.round(foundOrder.totalAmount || 0)}</p>
+              <p>
+                <strong>Order ID:</strong>{" "}
+                {foundOrder.orderId || foundOrder._id}
+              </p>
+              <p>
+                <strong>Name:</strong> {foundOrder.customerName}
+              </p>
+              <p>
+                <strong>Phone:</strong> {foundOrder.phone}
+              </p>
+              <p>
+                <strong>Address:</strong> {foundOrder.address}
+              </p>
+              <p>
+                <strong>Status:</strong> {foundOrder.status}
+              </p>
+              <p>
+                <strong>Total:</strong> ₹
+                {Math.round(foundOrder.totalAmount || 0)}
+              </p>
 
               <p>
                 <strong>Date:</strong>{" "}

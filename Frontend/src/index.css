@@ -12,7 +12,7 @@ body {
   /* ✅ min-height NOT height:100% — allows window to scroll naturally */
   min-height: 100%;
   overflow-x: hidden;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 #root {

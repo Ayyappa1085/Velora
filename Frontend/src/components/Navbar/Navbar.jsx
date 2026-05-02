@@ -16,16 +16,12 @@ function Navbar() {
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [mobileScrolled, setMobileScrolled] =
-    useState(false);
-  const [showFilterSort, setShowFilterSort] =
-    useState(false);
+  const [mobileScrolled, setMobileScrolled] = useState(false);
+  const [showFilterSort, setShowFilterSort] = useState(false);
 
-  const [showSortMenu, setShowSortMenu] =
-    useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const [sortType, setSortType] =
-    useState("default");
+  const [sortType, setSortType] = useState("default");
 
   const ticking = useRef(false);
   const lastScrollY = useRef(0);
@@ -34,12 +30,9 @@ function Navbar() {
   const location = useLocation();
 
   const isAuthPage =
-    location.pathname === "/login" ||
-    location.pathname === "/register";
+    location.pathname === "/login" || location.pathname === "/register";
 
-  const pathParts = location.pathname
-    .split("/")
-    .filter(Boolean);
+  const pathParts = location.pathname.split("/").filter(Boolean);
 
   const currentCategory = pathParts[0];
   const isSubCategory = pathParts.length >= 2;
@@ -63,51 +56,27 @@ function Navbar() {
 
     const updateScrollState = () => {
       const scrollTop = window.scrollY;
-      const mobile =
-        window.innerWidth <= 768;
+      const mobile = window.innerWidth <= 768;
 
-      const nextScrolled =
-        scrollTop > 10;
+      const nextScrolled = scrollTop > 10;
 
-      const nextProgress = Math.min(
-        scrollTop / MAX_SCROLL,
-        1
-      );
+      const nextProgress = Math.min(scrollTop / MAX_SCROLL, 1);
 
-      setScrolled((prev) =>
-        prev !== nextScrolled
-          ? nextScrolled
-          : prev
-      );
+      setScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
 
       setProgress((prev) =>
-        Math.abs(
-          prev - nextProgress
-        ) > 0.01
-          ? nextProgress
-          : prev
+        Math.abs(prev - nextProgress) > 0.01 ? nextProgress : prev,
       );
 
       if (mobile) {
-        const nextMobile =
-          scrollTop >
-            lastScrollY.current &&
-          scrollTop > 40;
+        const nextMobile = scrollTop > lastScrollY.current && scrollTop > 40;
 
-        setMobileScrolled((prev) =>
-          prev !== nextMobile
-            ? nextMobile
-            : prev
-        );
+        setMobileScrolled((prev) => (prev !== nextMobile ? nextMobile : prev));
       } else {
         setMobileScrolled(false);
       }
 
-      setShowFilterSort(
-        isSubCategory &&
-          scrollTop > 80 &&
-          !showSearch
-      );
+      setShowFilterSort(isSubCategory && scrollTop > 80 && !showSearch);
 
       lastScrollY.current = scrollTop;
       ticking.current = false;
@@ -115,71 +84,41 @@ function Navbar() {
 
     const handleScroll = () => {
       if (!ticking.current) {
-        requestAnimationFrame(
-          updateScrollState
-        );
+        requestAnimationFrame(updateScrollState);
         ticking.current = true;
       }
     };
 
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      { passive: true }
-    );
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     handleScroll();
 
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-  }, [
-    isSubCategory,
-    showSearch,
-    isAuthPage,
-  ]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isSubCategory, showSearch, isAuthPage]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "velora-sort",
-      sortType
-    );
+    localStorage.setItem("velora-sort", sortType);
   }, [sortType]);
 
-  const navStyle =
-    !isMobile
-      ? {
-          height: `${
-            MAX_H -
-            progress *
-              (MAX_H - MIN_H)
-          }px`,
-        }
-      : {};
+  const navStyle = !isMobile
+    ? {
+        height: `${MAX_H - progress * (MAX_H - MIN_H)}px`,
+      }
+    : {};
 
-  const logoStyle =
-    !isMobile
-      ? {
-          fontSize: `${
-            2.6 -
-            progress * 1.2
-          }em`,
-        }
-      : {};
+  const logoStyle = !isMobile
+    ? {
+        fontSize: `${2.6 - progress * 1.2}em`,
+      }
+    : {};
 
   return (
     <>
       <TopBar hidden={mobileScrolled} />
 
       <nav
-        className={`navbar ${
-          scrolled ? "scrolled" : ""
-        } ${
-          mobileScrolled
-            ? "mobile-up"
-            : ""
+        className={`navbar ${scrolled ? "scrolled" : ""} ${
+          mobileScrolled ? "mobile-up" : ""
         }`}
         style={navStyle}
       >
@@ -198,20 +137,12 @@ function Navbar() {
         />
 
         <div className="nav-logo">
-          <h2
-            onClick={() =>
-              navigate("/")
-            }
-            style={logoStyle}
-          >
+          <h2 onClick={() => navigate("/")} style={logoStyle}>
             Velora
           </h2>
         </div>
 
-        <NavIcons
-          navigate={navigate}
-          location={location}
-        />
+        <NavIcons navigate={navigate} location={location} />
       </nav>
 
       <MobileNav

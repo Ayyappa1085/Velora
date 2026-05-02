@@ -25,9 +25,7 @@ function AdminHeader() {
     <div className="admin-header">
       <h1>{pageTitle}</h1>
 
-      <button onClick={handleLogout}>
-        Logout
-      </button>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }

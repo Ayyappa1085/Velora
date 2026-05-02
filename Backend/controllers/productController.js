@@ -3,13 +3,7 @@ const Product = require("../models/Product");
 /* ================= GET PRODUCTS ================= */
 const getProducts = async (req, res) => {
   try {
-    const {
-      category,
-      type,
-      search,
-      page = 1,
-      limit = 12,
-    } = req.query;
+    const { category, type, search, page = 1, limit = 12 } = req.query;
 
     let query = {};
 
@@ -126,11 +120,9 @@ const updateProduct = async (req, res) => {
       };
     }
 
-    const updated = await Product.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    const updated = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
 
     res.status(200).json(updated);
   } catch {
@@ -162,7 +154,7 @@ const updateStock = async (req, res) => {
     const updated = await Product.findByIdAndUpdate(
       req.params.id,
       { sizeStock },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json(updated);

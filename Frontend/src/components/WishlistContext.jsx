@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -73,14 +68,10 @@ export function WishlistProvider({ children }) {
 
       // 🔥 OPTIMISTIC UI (instant response)
       setWishlist((prev) => {
-        const exists = prev.some(
-          (item) => item._id === productId
-        );
+        const exists = prev.some((item) => item._id === productId);
 
         if (exists) {
-          return prev.filter(
-            (item) => item._id !== productId
-          );
+          return prev.filter((item) => item._id !== productId);
         } else {
           return [...prev, product];
         }
@@ -101,7 +92,6 @@ export function WishlistProvider({ children }) {
 
       // 🔥 FINAL SYNC (real data)
       await fetchWishlist();
-
     } catch {
       console.log("Wishlist update failed");
 
@@ -116,9 +106,7 @@ export function WishlistProvider({ children }) {
   const isWishlisted = (product) => {
     const productId = product._id?.toString();
 
-    return wishlist.some(
-      (item) => item._id === productId
-    );
+    return wishlist.some((item) => item._id === productId);
   };
 
   return (
@@ -139,9 +127,7 @@ export function useWishlist() {
   const context = useContext(WishlistContext);
 
   if (!context) {
-    throw new Error(
-      "useWishlist must be used within WishlistProvider"
-    );
+    throw new Error("useWishlist must be used within WishlistProvider");
   }
 
   return context;

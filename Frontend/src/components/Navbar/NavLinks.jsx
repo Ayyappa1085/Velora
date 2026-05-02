@@ -14,8 +14,7 @@ function NavLinks({
   onSortClick,
   setSortType,
 }) {
-  const showMobileSearch =
-    isMobile && showSearch;
+  const showMobileSearch = isMobile && showSearch;
 
   return (
     <div className="nav-left">
@@ -35,56 +34,29 @@ function NavLinks({
       ) : (
         <>
           <a
-            className={
-              currentCategory === "men"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              navigate("/men")
-            }
+            className={currentCategory === "men" ? "active" : ""}
+            onClick={() => navigate("/men")}
           >
             MEN
           </a>
 
           <a
-            className={
-              currentCategory === "women"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              navigate("/women")
-            }
+            className={currentCategory === "women" ? "active" : ""}
+            onClick={() => navigate("/women")}
           >
             WOMEN
           </a>
 
           <a
-            className={
-              currentCategory === "kids"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              navigate("/kids")
-            }
+            className={currentCategory === "kids" ? "active" : ""}
+            onClick={() => navigate("/kids")}
           >
             KIDS
           </a>
 
           <a
-            className={
-              currentCategory ===
-              "footwear"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              navigate(
-                "/footwear"
-              )
-            }
+            className={currentCategory === "footwear" ? "active" : ""}
+            onClick={() => navigate("/footwear")}
           >
             FOOTWEAR
           </a>

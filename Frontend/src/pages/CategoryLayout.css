@@ -49,7 +49,6 @@
 
 /* MOBILE */
 @media (max-width: 768px) {
-
   .category-layout {
     flex-direction: column;
     position: relative;

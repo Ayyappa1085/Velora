@@ -1,140 +1,91 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// ❌ REMOVE axios
+// import axios from "axios";
 import "../styles/Account.css";
 
-const API =
-  "http://localhost:5000/api/orders";
+// ✅ ADD API
+import api from "../utils/api";
+
+const API = "/api/orders";
 
 function TrackOrder() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const [trackingId, setTrackingId] =
-    useState("");
+  const [trackingId, setTrackingId] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [result, setResult] =
-    useState(null);
+  const [result, setResult] = useState(null);
 
-  const handleTrack =
-    async () => {
-      if (!trackingId.trim()) return;
+  const handleTrack = async () => {
+    if (!trackingId.trim()) return;
 
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        const token =
-          localStorage.getItem("token"); // ✅ FIX
+      const res = await api.get(API);
 
-        const res =
-          await axios.get(API, {
-            headers: {
-              Authorization: `Bearer ${token}`, // ✅ FIX
-            },
-          });
+      // ✅ SAFE DATA
+      const orders = Array.isArray(res.data) ? res.data : res.data.orders || [];
 
-        const orders =
-          res.data || [];
-
-        const found =
-          orders.find(
-            (item) =>
-              (
-                item.orderId ||
-                item._id
-              )
-                .toLowerCase()
-                .trim() ===
-              trackingId
-                .toLowerCase()
-                .trim()
-          );
-
-        setResult(
-          found || false
-        );
-      } catch (error) {
-        console.log("TRACK ERROR:", error);
-        setResult(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  const formatDate = (date) =>
-    new Date(date).toLocaleString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
-
-  const getSteps = (order) => {
-    const status =
-      order.status?.toLowerCase();
-
-    const adminDate =
-      formatDate(
-        order.updatedAt ||
-          order.createdAt
+      const found = orders.find(
+        (item) =>
+          (item.orderId || item._id).toString().toLowerCase().trim() ===
+          trackingId.toLowerCase().trim(),
       );
 
-    const confirmedDone =
-      [
-        "confirmed",
-        "shipped",
-        "delivered",
-      ].includes(status);
+      setResult(found || false);
+    } catch (error) {
+      console.log("TRACK ERROR:", error);
+      setResult(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const shippedDone =
-      [
-        "shipped",
-        "delivered",
-      ].includes(status);
+  const formatDate = (date) =>
+    new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-    const deliveredDone =
-      status ===
-      "delivered";
+  const getSteps = (order) => {
+    const status = order.status?.toLowerCase();
+
+    const adminDate = formatDate(order.updatedAt || order.createdAt);
+
+    const confirmedDone = ["confirmed", "shipped", "delivered"].includes(
+      status,
+    );
+
+    const shippedDone = ["shipped", "delivered"].includes(status);
+
+    const deliveredDone = status === "delivered";
 
     return [
       {
         label: "Placed",
         done: true,
-        date: confirmedDone
-          ? adminDate
-          : "",
+        date: confirmedDone ? adminDate : "",
       },
       {
         label: "Confirmed",
-        done:
-          confirmedDone,
-        date: confirmedDone
-          ? adminDate
-          : "",
+        done: confirmedDone,
+        date: confirmedDone ? adminDate : "",
       },
       {
         label: "Shipped",
-        done:
-          shippedDone,
-        date: shippedDone
-          ? adminDate
-          : "",
+        done: shippedDone,
+        date: shippedDone ? adminDate : "",
       },
       {
         label: "Delivered",
-        done:
-          deliveredDone,
-        date:
-          deliveredDone
-            ? adminDate
-            : "",
+        done: deliveredDone,
+        date: deliveredDone ? adminDate : "",
       },
     ];
   };
@@ -142,135 +93,67 @@ function TrackOrder() {
   return (
     <div className="account-page">
       <div className="account-card track-page-card">
-        <h2>
-          Track Order
-        </h2>
+        <h2>Track Order</h2>
 
         <input
           type="text"
           className="track-input"
           placeholder="Enter Order ID"
           value={trackingId}
-          onChange={(e) =>
-            setTrackingId(
-              e.target.value
-            )
-          }
+          onChange={(e) => setTrackingId(e.target.value)}
         />
 
-        <button
-          onClick={
-            handleTrack
-          }
-        >
-          {loading
-            ? "Searching..."
-            : "Search"}
+        <button onClick={handleTrack}>
+          {loading ? "Searching..." : "Search"}
         </button>
 
         {result === false && (
-          <div className="track-result">
-            Order not found
+          <div className="track-result">Order not found</div>
+        )}
+
+        {result && result.status?.toLowerCase() === "cancelled" && (
+          <div className="tracking-box">
+            <div className="cancel-box">
+              <span className="cancel-dot"></span>
+
+              <div>
+                <h3>Cancelled</h3>
+
+                <p>{formatDate(result.updatedAt)}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        {result &&
-          result.status?.toLowerCase() ===
-            "cancelled" && (
-            <div className="tracking-box">
-              <div className="cancel-box">
-                <span className="cancel-dot"></span>
+        {result && result.status?.toLowerCase() !== "cancelled" && (
+          <div className="tracking-box">
+            {getSteps(result).map((step, index) => (
+              <div className="timeline-item" key={index}>
+                <div className="timeline-left">
+                  <span
+                    className={`timeline-dot ${step.done ? "active" : ""}`}
+                  ></span>
 
-                <div>
-                  <h3>
-                    Cancelled
-                  </h3>
+                  {index !== 3 && (
+                    <span
+                      className={`timeline-line ${step.done ? "active" : ""}`}
+                    ></span>
+                  )}
+                </div>
 
-                  <p>
-                    {formatDate(
-                      result.updatedAt
-                    )}
-                  </p>
+                <div className="timeline-content">
+                  <h4 className={step.done ? "done-text" : ""}>{step.label}</h4>
+
+                  {step.date && <p>{step.date}</p>}
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-        {result &&
-          result.status?.toLowerCase() !==
-            "cancelled" && (
-            <div className="tracking-box">
-              {getSteps(
-                result
-              ).map(
-                (
-                  step,
-                  index
-                ) => (
-                  <div
-                    className="timeline-item"
-                    key={index}
-                  >
-                    <div className="timeline-left">
-                      <span
-                        className={`timeline-dot ${
-                          step.done
-                            ? "active"
-                            : ""
-                        }`}
-                      ></span>
+        <p className="demo-track">Use your Order ID from Orders Page</p>
 
-                      {index !==
-                        3 && (
-                        <span
-                          className={`timeline-line ${
-                            step.done
-                              ? "active"
-                              : ""
-                          }`}
-                        ></span>
-                      )}
-                    </div>
-
-                    <div className="timeline-content">
-                      <h4
-                        className={
-                          step.done
-                            ? "done-text"
-                            : ""
-                        }
-                      >
-                        {
-                          step.label
-                        }
-                      </h4>
-
-                      {step.date && (
-                        <p>
-                          {
-                            step.date
-                          }
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          )}
-
-        <p className="demo-track">
-          Use your Order ID
-          from Orders Page
-        </p>
-
-        <button
-          onClick={() =>
-            navigate(
-              "/account/profile"
-            )
-          }
-        >
+        <button onClick={() => navigate("/account/profile")}>
           Back to Profile
         </button>
       </div>

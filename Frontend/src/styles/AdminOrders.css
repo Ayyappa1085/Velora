@@ -45,7 +45,7 @@
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card p {
@@ -186,7 +186,7 @@
   background: #fff;
   border-radius: 20px;
   padding: 14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
 }
 
@@ -229,11 +229,21 @@
   font-size: 13px;
 }
 
-.status-select.pending { background: #fff3cd; }
-.status-select.confirmed { background: #d1ecf1; }
-.status-select.shipped { background: #d4edda; }
-.status-select.delivered { background: #c3e6cb; }
-.status-select.cancelled { background: #f8d7da; }
+.status-select.pending {
+  background: #fff3cd;
+}
+.status-select.confirmed {
+  background: #d1ecf1;
+}
+.status-select.shipped {
+  background: #d4edda;
+}
+.status-select.delivered {
+  background: #c3e6cb;
+}
+.status-select.cancelled {
+  background: #f8d7da;
+}
 
 .mobile-orders {
   display: none;
@@ -283,7 +293,7 @@
     background: #fff;
     border-radius: 18px;
     padding: 16px;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
   }
 
   .card-head {

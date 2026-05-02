@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// ❌ REMOVE axios
+// import axios from "axios";
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -11,47 +13,33 @@ import {
   Bar,
 } from "recharts";
 
+// ✅ ADD API
+import api from "../../utils/api";
+
 function AdminRevenue() {
-  const [stats, setStats] =
-    useState({
-      total: 0,
-      today: 0,
-      week: 0,
-      month: 0,
-    });
+  const [stats, setStats] = useState({
+    total: 0,
+    today: 0,
+    week: 0,
+    month: 0,
+  });
 
-  const [chartData, setChartData] =
-    useState([]);
+  const [chartData, setChartData] = useState([]);
 
-  const getToken = () =>
-    localStorage.getItem("token");
+  // ⚠️ KEEP (not breaking structure)
+  const getToken = () => localStorage.getItem("token");
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const token = getToken();
+        // ❌ REMOVE token usage
 
-        const res = await axios.get(
-          "http://localhost:5000/api/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // 🔥 FIX
-            },
-          }
-        );
+        const res = await api.get("/api/orders");
 
-        const raw =
-          Array.isArray(res.data)
-            ? res.data
-            : res.data.orders || [];
+        const raw = Array.isArray(res.data) ? res.data : res.data.orders || [];
 
-        const orders = raw.filter(
-          (item) =>
-            [
-              "Confirmed",
-              "Shipped",
-              "Delivered",
-            ].includes(item.status)
+        const orders = raw.filter((item) =>
+          ["Confirmed", "Shipped", "Delivered"].includes(item.status),
         );
 
         const now = new Date();
@@ -59,7 +47,7 @@ function AdminRevenue() {
         const startToday = new Date(
           now.getFullYear(),
           now.getMonth(),
-          now.getDate()
+          now.getDate(),
         );
 
         const start7 = new Date(startToday);
@@ -68,81 +56,50 @@ function AdminRevenue() {
         const start30 = new Date(startToday);
         start30.setDate(startToday.getDate() - 29);
 
-        const getAmount = (item) =>
-          Number(
-            item.totalAmount ||
-              item.total ||
-              0
-          );
+        const getAmount = (item) => Number(item.totalAmount || item.total || 0);
 
-        const total = orders.reduce(
-          (sum, item) =>
-            sum + getAmount(item),
-          0
-        );
+        const total = orders.reduce((sum, item) => sum + getAmount(item), 0);
 
         const today = orders
           .filter((item) => {
             const d = new Date(item.createdAt);
             return d >= startToday;
           })
-          .reduce(
-            (sum, item) =>
-              sum + getAmount(item),
-            0
-          );
+          .reduce((sum, item) => sum + getAmount(item), 0);
 
         const week = orders
           .filter((item) => {
             const d = new Date(item.createdAt);
             return d >= start7;
           })
-          .reduce(
-            (sum, item) =>
-              sum + getAmount(item),
-            0
-          );
+          .reduce((sum, item) => sum + getAmount(item), 0);
 
         const month = orders
           .filter((item) => {
             const d = new Date(item.createdAt);
             return d >= start30;
           })
-          .reduce(
-            (sum, item) =>
-              sum + getAmount(item),
-            0
-          );
+          .reduce((sum, item) => sum + getAmount(item), 0);
 
-        const last7 = Array.from(
-          { length: 7 },
-          (_, i) => {
-            const dayDate = new Date(start7);
-            dayDate.setDate(start7.getDate() + i);
+        const last7 = Array.from({ length: 7 }, (_, i) => {
+          const dayDate = new Date(start7);
+          dayDate.setDate(start7.getDate() + i);
 
-            const nextDate = new Date(dayDate);
-            nextDate.setDate(dayDate.getDate() + 1);
+          const nextDate = new Date(dayDate);
+          nextDate.setDate(dayDate.getDate() + 1);
 
-            const revenue = orders
-              .filter((item) => {
-                const d = new Date(item.createdAt);
-                return d >= dayDate && d < nextDate;
-              })
-              .reduce(
-                (sum, item) =>
-                  sum + getAmount(item),
-                0
-              );
+          const revenue = orders
+            .filter((item) => {
+              const d = new Date(item.createdAt);
+              return d >= dayDate && d < nextDate;
+            })
+            .reduce((sum, item) => sum + getAmount(item), 0);
 
-            return {
-              day: dayDate.toLocaleDateString(
-                "en-US",
-                { weekday: "short" }
-              ),
-              revenue,
-            };
-          }
-        );
+          return {
+            day: dayDate.toLocaleDateString("en-US", { weekday: "short" }),
+            revenue,
+          };
+        });
 
         setStats({
           total: Math.round(total),
@@ -172,25 +129,16 @@ function AdminRevenue() {
       <div className="revenue-banner">
         <p>Revenue Overview</p>
 
-        <h1>
-          ₹{stats.total.toLocaleString()}
-        </h1>
+        <h1>₹{stats.total.toLocaleString()}</h1>
 
-        <span>
-          Successful orders only
-        </span>
+        <span>Successful orders only</span>
       </div>
 
       <div className="revenue-mini-grid">
         {cards.map((card) => (
-          <div
-            className="revenue-mini-card"
-            key={card.title}
-          >
+          <div className="revenue-mini-card" key={card.title}>
             <p>{card.title}</p>
-            <h3>
-              ₹{card.value.toLocaleString()}
-            </h3>
+            <h3>₹{card.value.toLocaleString()}</h3>
           </div>
         ))}
       </div>
@@ -198,19 +146,10 @@ function AdminRevenue() {
       <div className="chart-box">
         <h3>Last 7 Days Trend</h3>
 
-        <ResponsiveContainer
-          width="100%"
-          height={280}
-        >
+        <ResponsiveContainer width="100%" height={280}>
           <AreaChart data={chartData}>
             <defs>
-              <linearGradient
-                id="revFill"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
+              <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#111" stopOpacity={0.8} />
                 <stop offset="100%" stopColor="#111" stopOpacity={0.05} />
               </linearGradient>
@@ -234,20 +173,13 @@ function AdminRevenue() {
       <div className="chart-box">
         <h3>Revenue Breakdown</h3>
 
-        <ResponsiveContainer
-          width="100%"
-          height={260}
-        >
+        <ResponsiveContainer width="100%" height={260}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="day" />
             <Tooltip />
 
-            <Bar
-              dataKey="revenue"
-              fill="#111"
-              radius={[8, 8, 0, 0]}
-            />
+            <Bar dataKey="revenue" fill="#111" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
