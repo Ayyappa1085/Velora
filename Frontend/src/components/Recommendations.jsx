@@ -1,26 +1,24 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useBag } from "../BagContext";
-
-const API = "http://localhost:5000/api/products";
+import API from "../utils/api"; // ✅ central API config
 
 function Recommendations() {
   const { bag, addToBag } = useBag();
 
   const [products, setProducts] = useState([]);
-
   const [openSize, setOpenSize] = useState(null);
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await axios.get(API);
+        const res = await axios.get(`${API}/api/products`);
 
         const data = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.products)
-            ? res.data.products
-            : [];
+          ? res.data.products
+          : [];
 
         setProducts(data);
       } catch (error) {

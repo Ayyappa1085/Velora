@@ -26,7 +26,6 @@ function Payment() {
 
       const backendCart = res.data || [];
 
-      // 🔥 EXTRA SYNC CHECK (NEW)
       if (backendCart.length !== (data?.bagItems?.length || 0)) {
         toast.error("Cart changed. Please refresh.");
         return false;
@@ -37,7 +36,7 @@ function Payment() {
 
         if (stock === 0) {
           toast.error(
-            `${item.product?.title || "Item"} (${item.size}) is out of stock`,
+            `${item.product?.title || "Item"} (${item.size}) is out of stock`
           );
           return false;
         }
@@ -54,6 +53,34 @@ function Payment() {
       toast.error("Failed to validate cart");
       return false;
     }
+  };
+
+  /* ================= 🔥 FORMAT ITEMS (REUSED) ================= */
+  const getFormattedItems = () => {
+    return data.bagItems.map((item) => {
+      let productId = null;
+
+      if (item.product && item.product._id) {
+        productId = item.product._id;
+      } else if (typeof item.product === "string") {
+        productId = item.product;
+      } else if (item._id) {
+        productId = item._id;
+      }
+
+      if (!productId) {
+        throw new Error("Invalid product in cart");
+      }
+
+      return {
+        product: productId,
+        title: item.product?.title || "",
+        price: item.product?.price || 0,
+        image: item.product?.image || item.product?.images?.[0] || "",
+        quantity: item.quantity,
+        size: item.size,
+      };
+    });
   };
 
   const handlePlaceOrder = async (paymentDetails) => {
@@ -74,30 +101,7 @@ function Payment() {
         (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
         Date.now().toString();
 
-      const formattedItems = data.bagItems.map((item) => {
-        let productId = null;
-
-        if (item.product && item.product._id) {
-          productId = item.product._id;
-        } else if (typeof item.product === "string") {
-          productId = item.product;
-        } else if (item._id) {
-          productId = item._id;
-        }
-
-        if (!productId) {
-          throw new Error("Invalid product in cart");
-        }
-
-        return {
-          product: productId,
-          title: item.product?.title || "",
-          price: item.product?.price || 0,
-          image: item.product?.image || item.product?.images?.[0] || "",
-          quantity: item.quantity,
-          size: item.size,
-        };
-      });
+      const formattedItems = getFormattedItems();
 
       const payload = {
         customerName: data.addressData?.name || "Guest",
@@ -131,7 +135,7 @@ function Payment() {
       toast.error(
         error?.response?.data?.message ||
           error.message ||
-          "Order failed. Try again.",
+          "Order failed. Try again."
       );
     } finally {
       setLoading(false);
@@ -142,17 +146,19 @@ function Payment() {
   /* ================= 🔥 PAYMENT ================= */
   const handleRazorpayPayment = async () => {
     try {
-      // ✅ VALIDATE BEFORE PAYMENT
       const valid = await validateCart();
       if (!valid) return;
 
       setLoading(true);
 
+      const formattedItems = getFormattedItems(); // ✅ NEW
+
+      // 🔥 FIXED HERE (IMPORTANT)
       const res = await api.post("/api/payment/create-order", {
-        amount: data.total,
+        items: formattedItems,
       });
 
-      const order = res.data;
+      const order = res.data.order;
 
       const options = {
         key: "rzp_test_SkRHJI7zZDoOMG",

@@ -17,13 +17,21 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-app.use(cors());
+/* ================= CORS (FIXED) ================= */
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // local frontend
+      "https://your-frontend.vercel.app", // 🔥 replace after deploy
+    ],
+    credentials: true,
+  })
+);
 
-// ✅ ONLY JSON (no webhook raw needed now)
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
 
 /* ================= ROUTES ================= */
-
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
@@ -34,8 +42,12 @@ app.use("/api/saved", savedRoutes);
 
 app.use("/api/payment", paymentRoutes);
 
-/* ================= DB CONNECTION ================= */
+/* ================= HEALTH CHECK ================= */
+app.get("/", (req, res) => {
+  res.send("Velora Backend Running");
+});
 
+/* ================= DB CONNECTION ================= */
 mongoose
   .connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000,
@@ -53,14 +65,16 @@ mongoose
     console.log("Mongo Error:", err);
   });
 
-/* ================= TEST ROUTE ================= */
+/* ================= ERROR HANDLER (NEW) ================= */
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
 
-app.get("/", (req, res) => {
-  res.send("Velora Backend Running");
+  res.status(err.status || 500).json({
+    message: err.message || "Internal Server Error",
+  });
 });
 
 /* ================= SERVER ================= */
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

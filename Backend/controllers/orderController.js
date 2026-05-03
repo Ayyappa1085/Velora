@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-
-// ✅ NEW (ONLY ADDITION)
 const Cart = require("../models/Cart");
 
 /* ================= GENERATE ORDER ID ================= */
@@ -11,7 +9,7 @@ const generateOrderId = () => {
   return `VLR${num}`;
 };
 
-/* ================= CREATE ORDER (FULL SAFE + FIXED) ================= */
+/* ================= CREATE ORDER ================= */
 const createOrder = async (req, res) => {
   const session = await mongoose.startSession();
 
@@ -21,8 +19,18 @@ const createOrder = async (req, res) => {
     await session.withTransaction(async () => {
       const { items = [], idempotencyKey, paymentInfo } = req.body;
 
+      /* ================= BASIC VALIDATION ================= */
       if (!items.length) {
         throw new Error("No items in order");
+      }
+
+      // 🔥 PAYMENT VALIDATION (CRITICAL FIX)
+      if (
+        !paymentInfo ||
+        !paymentInfo.paymentId ||
+        !paymentInfo.orderId
+      ) {
+        throw new Error("Payment not verified");
       }
 
       /* ================= IDEMPOTENCY ================= */
@@ -37,6 +45,7 @@ const createOrder = async (req, res) => {
         }
       }
 
+      /* ================= UNIQUE ORDER ID ================= */
       let orderId = generateOrderId();
 
       let exists = await Order.findOne({ orderId }).session(session);
@@ -82,7 +91,7 @@ const createOrder = async (req, res) => {
               [`sizeStock.${size}`]: -qty,
             },
           },
-          { session },
+          { session }
         );
 
         if (result.modifiedCount === 0) {
@@ -124,20 +133,20 @@ const createOrder = async (req, res) => {
             orderId,
             user: req.user.id,
             idempotencyKey: idempotencyKey || undefined,
-            paymentInfo: paymentInfo || null,
+            paymentInfo,
             totalAmount: calculatedTotal,
           },
         ],
-        { session },
+        { session }
       );
 
       createdOrder = order[0];
 
-      /* ================= 🔥 CLEAR CART (FINAL FIX) ================= */
+      /* ================= CLEAR CART ================= */
       await Cart.updateOne(
         { user: req.user.id },
         { $set: { items: [] } },
-        { session },
+        { session }
       );
     });
 
@@ -210,7 +219,8 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    status =
+      status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
     const allowed = [
       "Placed",
@@ -229,7 +239,7 @@ const updateOrderStatus = async (req, res) => {
     const updated = await Order.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true },
+      { new: true }
     );
 
     if (!updated) {
@@ -241,6 +251,7 @@ const updateOrderStatus = async (req, res) => {
     res.status(200).json(updated);
   } catch (error) {
     console.log("STATUS UPDATE ERROR:", error);
+
     res.status(500).json({
       message: "Failed to update status",
     });
